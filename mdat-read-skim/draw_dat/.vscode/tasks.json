@@ -1,0 +1,35 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "echo",
+            "type": "shell",
+            "command": "root",
+            // "command": "clang++",
+            "args": [
+                // "-l -q",
+                "-l",
+                // "-o",
+                // "a.out",
+                // "mdat_to_txt.cpp"
+                // "mdat_cut_pede.cpp"
+                "mdat_cut_pede_hist.cpp"
+                // "draw_mdat_matrix.cpp"
+                // "draw_mdat.cpp"
+                // "draw_dat_matrix.cpp"
+                // "draw_dat.cpp"
+                // "mdat_to_pede/.cpp",
+                // "`root-config --cflags`"//the name is same to launch.json, no blank between -o and app
+                // "demo.cpp",
+                // "Customer.cpp",
+                // "draw.cpp"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "istream": "cpp",
+        "*.tcc": "cpp",
+        "ios": "cpp",
+        "iostream": "cpp",
+        "new": "cpp",
+        "iosfwd": "cpp",
+        "vector": "cpp",
+        "algorithm": "cpp",
+        "random": "cpp",
+        "ostream": "cpp",
+        "fstream": "cpp",
+        "locale": "cpp",
+        "sstream": "cpp"
+    }
+}
