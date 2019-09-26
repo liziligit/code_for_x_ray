@@ -41,8 +41,8 @@ void mdat_cut_pede_hist()
     int sumsig;   
     int mode = 0;
     char inPdedFile[] = "../data/pede.txt";
-    // char inDataFile[] = "../data/out5.mdat";
-    char inDataFile[] = "../data/2outframe.dat";
+    char inDataFile[] = "../data/out5.mdat";
+    // char inDataFile[] = "../data/2outframe.dat";
 
     // char inPdedFile[] = "/Users/lizili/Desktop/CSNS/20190917_TM1_1_hpdaq_onechannel_just_code/data/runData/cnsn_20190917ok/xpede_2.txt";
     // char inDataFile[] = "/Users/lizili/Desktop/CSNS/20190917_TM1_1_hpdaq_onechannel_just_code/data/runData/cnsn_20190917ok/xbeam_30.pd1";
@@ -154,7 +154,7 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
         top_pad->Draw(); 
 
         // while(infileSig.good() && ndata < iFrames+1){//&& ndata < iFrames+1
-        while(infileSig.good() && ndata < 759){//&& ndata < iFrames+1
+        while(infileSig.good() && ndata < 200){//&& ndata < iFrames+1
         H2 = new TH2F(Form("H2_%d", ndata),"Projection",72,0,72,72,0,72);
         // sumsig = 0;
         int _data_int[NX][NY];//unsigned short for .mdat, int for .dat-------->2/3
