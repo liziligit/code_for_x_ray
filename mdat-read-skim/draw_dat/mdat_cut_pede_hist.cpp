@@ -20,6 +20,7 @@
 #include <vector>
 #include <cstdlib>// exit()
 #include "loader_file.h"
+#include "kbhit.h"
 
 // using namespace RooFit;
 using namespace std;
@@ -40,6 +41,7 @@ void mdat_cut_pede_hist()
     char str[30];
     int sumsig;   
     int mode = 0;
+    int ch;
     char inPdedFile[] = "../data/pede.txt";
     char inDataFile[] = "../data/out5.mdat";
     // char inDataFile[] = "../data/2outframe.dat";
@@ -139,7 +141,7 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
 	}
 //////////////////////////////////////////////////for 3D array
 
-        int ndata = 0;
+        // int ndata = 0;
         if(mode == 3)
         {
         char header[1024];
@@ -153,9 +155,11 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
         top_pad = new TPad("top_pad", "top_pad",0.0,0.55,0.6,1.0);
         top_pad->Draw(); 
 
-        // while(infileSig.good() && ndata < iFrames+1){//&& ndata < iFrames+1
-        while(infileSig.good() && ndata < 200){//&& ndata < iFrames+1
-        H2 = new TH2F(Form("H2_%d", ndata),"Projection",72,0,72,72,0,72);
+        // while(infileSig.good() && i < iFrames+1){//&& i < iFrames+1
+        // while(infileSig.good() && i < 200)
+        for(int i = 0; i < 100; i++)
+        {//&& ndata < iFrames+1
+        H2 = new TH2F(Form("H2_%d", i),"Projection",72,0,72,72,0,72);
         // sumsig = 0;
         int _data_int[NX][NY];//unsigned short for .mdat, int for .dat-------->2/3
         unsigned short _data_short[NX][NY];//unsigned short for .mdat, int for .dat-------->2/3
@@ -167,9 +171,8 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
          for (int ii = 0; ii < NX; ii++){
                for (int jj = 0; jj < NY; jj++){
                 //    sumsig = sumsig + _data[ii][jj];
-                    array3D[ndata][ii][jj] = _data_int[ii][jj] - meanPed[ii*72+jj];
-                    // H2[ndata]->Fill(ii, jj, array3D[ndata][ii][jj]);
-                    H2->Fill(ii, jj, array3D[ndata][ii][jj]);
+                    array3D[i][ii][jj] = _data_int[ii][jj] - meanPed[ii*72+jj];
+                    H2->Fill(ii, jj, array3D[i][ii][jj]);
                    }
             }
         }
@@ -180,9 +183,8 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
          for (int ii = 0; ii < NX; ii++){
                for (int jj = 0; jj < NY; jj++){
                 //    sumsig = sumsig + _data[ii][jj];
-                    array3D[ndata][ii][jj] = _data_short[ii][jj] - meanPed[ii*72+jj];
-                    // H2[ndata]->Fill(ii, jj, array3D[ndata][ii][jj]);
-                    H2->Fill(ii, jj, array3D[ndata][ii][jj]);
+                    array3D[i][ii][jj] = _data_short[ii][jj] - meanPed[ii*72+jj];
+                    H2->Fill(ii, jj, array3D[i][ii][jj]);
                    }
             }
         }
@@ -199,8 +201,6 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
         gStyle->SetPalette(1);
         H2->Draw("COLZ");
 
-        // H2->SetStats(0);
-
         top_pad->cd();
         projh2X->SetFillColor(kBlue-2);
         projh2X->SetTitle("ProjectionX");
@@ -209,33 +209,48 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
 
         right_pad->cd();
         projh2Y->SetFillColor(kBlue-2);
-        sprintf(str, "frame %d",ndata);
+        sprintf(str, "frame %d",i);
         projh2Y->SetTitle(str);
         projh2Y->GetYaxis()->SetRangeUser(0,1000);
         projh2Y->Draw("hbar"); 
-        ndata++;
-        // ndata+=1;
-        // cout<<ndata<<endl;      //1~809
+        // ndata++;
             // char buf[100];
             //  sprintf(&buf[0],"./mdat_frame%d_matrix_to_txt.jpg",ndata);
             //  c1->SaveAs(buf);
 
         c1->cd();
-        // TLatex *t = new TLatex();
-        // t->SetTextFont(42);
-        // t->SetTextSize(0.05);
-        // t->DrawLatex(0.6,0.88, str);
-        // t->DrawLatex(0.6,0.88, "The histogram and");
-        // t->DrawLatex(0.6,0.85,"its two projections");
 
         // auto ex = new TExec("zoom","ZoomExec()");
-        auto ex = new TExec(Form("zoom_%d", ndata),"ZoomExec()");
+        auto ex = new TExec(Form("zoom_%d", i),"ZoomExec()");
         H2->GetListOfFunctions()->Add(ex);
         c1->Update(); 
         // sleep(1);//second
         if (gSystem->ProcessEvents())//不能去除，否则没有动画
             break;
-       }
+
+        // if(kbhit()) //不能任意取帧数，所以暂时实现不了
+        //     {
+ 		// 	    ch=getch();
+ 		// 	    //cout<<"key is "<<int(ch)<<endl;
+		// 		if(ch==27) break;// Esc == 27,Spacebar=32,Enter=13&108,
+		// 		//LeftArrow=37, RightArrow=39, UpArrow=38,DownArrow=40
+		// 		// if(ch==38) break;				
+		// 		if(ch==32)
+		// 		{
+		// 			wait_opera: cout << "请输入正负10000内的数字前后跳帧,-10000跳到上个pd1,10000跳到下个pd1,50000截图,0继续" << endl;
+		// 			scanf("%d", &Key_input);
+		// 			if( Key_input == 0 )
+		// 			{
+		// 				cout << "You input zero, continue!" << endl;
+		// 			}	
+		// 			else
+		// 			{	
+		// 				change_frame: i = i + Key_input;						
+		// 				goto change_frame;
+		// 			}//if( Key_input != 0 )			    		
+		// 		}//if(ch==32)				
+		// 	}//kbhit()
+        }
 
 // delete H2;//手动清空堆Heap中内存
 // H2 = NULL;//使堆Heap的指针指向空
