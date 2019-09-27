@@ -2,3 +2,5 @@
 *.dat
 
 .DS_Store
+
+*.mdat

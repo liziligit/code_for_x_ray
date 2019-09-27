@@ -12,6 +12,11 @@
         "ostream": "cpp",
         "fstream": "cpp",
         "locale": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "draw2dopt.C": "cpp",
+        "__bit_reference": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "unordered_map": "cpp"
     }
 }

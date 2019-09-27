@@ -74,8 +74,8 @@ void SaveData(ofstream *ofSignal)
 
     for(int i=0; i<fEventList.size(); i++)
     {
-        if(fEventList[i]->GetDataQuality() == QF_Ped) continue;//满足条件时不执行循环体剩余部分
-        if(fEventList[i]->GetDataQuality() == QF_AfterPulse) continue;
+        if(fEventList[i]->GetDataQuality() == QF_Ped) continue;//满足条件时不执行循环体剩余部分,const int QF_Ped = 0;
+        if(fEventList[i]->GetDataQuality() == QF_AfterPulse) continue;//const QF_AfterPulse = 3;
 
         cout<<" Event: "<<i<<" is stored."<<endl;
         for(int ii=0; ii<NX; ii++)
@@ -129,7 +129,7 @@ void AnalysisPed(TString pp)
 
     for (int i = 0; i < NX; i++)
         for (int j = 0; j < NY; j++)
-            hPed->SetBinContent(i + 1, j + 1, fPed[i * NY + j]->GetMean() + nsig * 1.1);
+            hPed->SetBinContent(i + 1, j + 1, fPed[i * NY + j]->GetMean() + nsig * 1.1);//const int nsig = 3;
 
     cout << "----> ped analysis for " << pp << " is finished" << endl;
 }
@@ -183,18 +183,18 @@ void Skim(TString pp, ofstream *ofSignal)
     {
         cout << ii << ": " << clusterList[0].at(ii) << " ~ " << clusterList[1].at(ii) << endl;
 
-        int dataFlag = QF_Hit;
+        int dataFlag = QF_Hit;//const int QF_Hit = 1;
         // muon like:
         int ibeg = clusterList[0].at(ii);
         if (fEventList[ibeg]->GetPulseHeight() < 600)
-            dataFlag = QF_MuLike;
+            dataFlag = QF_MuLike;//const int QF_MuLike = 2;
 
         fEventList[ibeg]->SetDataQuality(dataFlag);
         cout << "\t" << fEventList[ibeg]->GetDataQuality() << ", " << fEventList[ibeg]->GetClusterSize() << ", " << fEventList[ibeg]->GetPulseHeight() << endl;
 
         for (int jj = clusterList[0].at(ii) + 1; jj <= clusterList[1].at(ii); jj++)
         {
-            fEventList[jj]->SetDataQuality(QF_AfterPulse);
+            fEventList[jj]->SetDataQuality(QF_AfterPulse);//const int QF_AfterPulse = 3;
             cout << "\t" << fEventList[jj]->GetDataQuality() << ", " << fEventList[jj]->GetClusterSize() << ", " << fEventList[jj]->GetPulseHeight() << endl;
         }
     }

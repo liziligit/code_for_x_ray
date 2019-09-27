@@ -103,12 +103,12 @@ class MyEventClass
     {
         dataQFlag = QF_Ped;
         id = _id;
-        xmin = _xmin;
-        xmax = _xmax;
-        ymin = _ymin;
-        ymax = _ymax;
-        nx = xmax - xmin + 1;
-        ny = ymax - ymin + 1;
+        xmin = _xmin;//0
+        xmax = _xmax;//71
+        ymin = _ymin;//0
+        ymax = _ymax;//71
+        nx = xmax - xmin + 1;//72
+        ny = ymax - ymin + 1;//72
         f2D = NULL;
         mBcenter = NULL;
         lPrinAxis1 = NULL;
@@ -216,9 +216,9 @@ void MyEventClass::EtchHistogram(TH2F *f0, TH2F *f1)
     int etchData[netch][netch] = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
 
     //... etching
-    for (int i = xmin; i < nx; i++)
-        for (int j = ymin; j < ny; j++)
-            f1->SetBinContent(i + 1, j + 1, 0);
+    for (int i = xmin; i < nx; i++)//0,72,i++
+        for (int j = ymin; j < ny; j++)//0,72//j++
+            f1->SetBinContent(i + 1, j + 1, 0);//1~72 set 0
 
     for (int i = xmin; i < nx; i++)
         for (int j = ymin; j < ny; j++)

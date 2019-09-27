@@ -15,8 +15,8 @@
                 // "a.out",
                 // "mdat_to_txt.cpp"
                 // "mdat_cut_pede.cpp"
-                "mdat_cut_pede_hist.cpp"
-                // "draw_mdat_matrix.cpp"
+                // "mdat_cut_pede_project.cpp"
+                "find_track.cpp"
                 // "draw_mdat.cpp"
                 // "draw_dat_matrix.cpp"
                 // "draw_dat.cpp"
