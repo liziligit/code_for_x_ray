@@ -6,9 +6,11 @@
 #include <dirent.h>//opendir()
 #include "loader_file.h"//file_size()
 #include "TGraph.h"
+#include <unistd.h>//sleep(3);second
 using namespace std;
 
 TH1F *H2;
+int NX = 72, NY = 72;
 
 int extractId(string & nameId, string head,string tail)
 {
@@ -65,29 +67,14 @@ int find_track()
         cout << idList[j] << ' ';
     }
     cout << "!!!" <<endl; 
-
     cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files" << " -> " << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     int iStart_num = 0;
-    int iAccout = 3;
+    int iAccout = 6;
+    
 
     cout << "Begin to analysis IdList[]: " << iStart_num << " to " << iAccout << endl;
-
-    char inDataFile[] = "../data/out5.mdat";
     ifstream infilePede(pedefn);
-    ifstream infileSig(inDataFile, ios::binary);
-
-
-    //*******************count the number of iFrames******
-    int NX = 72, NY = 72;
-    unsigned short _data0_short[NX][NY];//size of 1 frame for .mdat
-
-    int fz=file_loder::file_size(inDataFile);
-    cout << "the size of file is: "<< fz << endl;
-    int iFrames = 0;
-    iFrames = fz / sizeof(_data0_short);
-    cout<<"iFrame num is: "<<iFrames<<endl;//758
-    //*******************count the number of iFrames******
 
     //*******************read Pede file************************
     int iChipT = 0, iPixelT = 0, iCounter=0;
@@ -102,57 +89,74 @@ int find_track()
     infilePede.close();  
     //*******************read Pede file************************
 
-    //*******************for 3D array*******************************
-    vector<vector<vector<float> > > array3D;
-    int DEPTH = iFrames+1;
-    int HEIGHT = NY;
-    int LONGTH = NX;
-	// 初始化
-	array3D.resize(DEPTH);//1
-	for (int i = 0; i < DEPTH; ++i) {//1
-		array3D[i].resize(HEIGHT);//2
- 
-		for (int j = 0; j < HEIGHT; ++j)//2
-			array3D[i][j].resize(LONGTH);//3
-	}
-    //*******************for 3D array*******************************
-
-
 //*******************draw the hist***************************************
-auto c1 = new TCanvas("c1","2-d options",10,10,800,600);
-H2 = new TH1F("H2","ADC",iFrames,0,iFrames);
-int sumsig;
+    TCanvas *c1 = new TCanvas("c1","Canvas",0,0,1600,800);
+    H2 = new TH1F("H2","ADC",808 * iAccout, 0, 808 * iAccout);//一个个的增加
+    int sumsig;
+    char inDataFile[200];
+    int iBin = 0;
 
-for(int i = 0; i < iFrames+1; i++)//&& i < iFrames+1
+    for(int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
+    {
+        
+        // char inDataFile[] = "../data/out5.mdat";
+        sprintf(inDataFile,"../data/out%d.mdat", idList[fileId]);
+
+        cout << inDataFile << endl;
+
+        ifstream infileSig(inDataFile, ios::binary);
+
+        //*******************count the number of iFrames******       
+        unsigned short _data0_short[NX][NY];//size of 1 frame for .mdat
+
+        int fz=file_loder::file_size(inDataFile);
+        // cout << "the size of file is: "<< fz << endl;
+        int iFrames = 0;
+        iFrames = fz / sizeof(_data0_short);
+        cout<<"iFrame num is: "<<iFrames<<endl;//758
+        //*******************count the number of iFrames******   
+
+        //*******************for 3D array*******************************
+        vector<vector<vector<float> > > array3D;
+        int DEPTH = iFrames + 1;
+        int HEIGHT = NY;
+        int LONGTH = NX;
+	    // 初始化
+	    array3D.resize(DEPTH);//1
+	    for (int i = 0; i < DEPTH; ++i) {//1
+		    array3D[i].resize(HEIGHT);//2
+		    for (int j = 0; j < HEIGHT; ++j){//2
+			    array3D[i][j].resize(LONGTH);//3
+                }
+	    }
+        //*******************for 3D array*******************************
+        // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
+        for(int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++)//&& i < iFrames+1
         {
         sumsig = 0;
-        int _data_int[NX][NY];//unsigned short for .mdat, int for .dat-------->2/3
-        unsigned short _data_short[NX][NY];//unsigned short for .mdat, int for .dat-------->2/3
+        int _data_int[NX][NY];//unsigned short for .mdat, int for .dat
+        unsigned short _data_short[NX][NY];//unsigned short for .mdat, int for .dat
 
         infileSig.read((char *)(&_data_short), sizeof(_data_short));
 
         for (int ii = 0; ii < NX; ii++){
             for (int jj = 0; jj < NY; jj++){               
-                array3D[i][ii][jj] = _data_short[ii][jj] - meanPed[ii*72+jj];
-                sumsig = sumsig + array3D[i][ii][jj];               
+                array3D[iFrameBegin][ii][jj] = _data_short[ii][jj] - meanPed[ii*72+jj];
+                sumsig = sumsig + array3D[iFrameBegin][ii][jj];               
                 }
             }
-
-        // H2->Fill(sumsig,i);
-        H2->SetBinContent(i,sumsig);
-        // cout<<sumsig<<endl;     //0~808
-        // sprintf(str, "frame %d",ndata);
-        // H2->SetTitle(str);
-        // gStyle->SetPalette(1);
-        H2->Draw();
-        // ndata++;
-            // char buf[100];
-            //  sprintf(&buf[0],"./mdat_frame%d_matrix_to_txt.jpg",ndata);
-            //  c1->SaveAs(buf);
-// delete H2;//手动清空堆Heap中内存
-// H2 = NULL;//使堆Heap的指针指向空
-}
-infileSig.close();
+        H2->SetBinContent(iBin,sumsig);
+        // cout<<sumsig<<endl;
+        iBin++;
+        }   
+        // H2->Draw();
+        // c1->Update(); 
+        // sleep(1);//second
+        // if (gSystem->ProcessEvents())//不能去除，否则没有动画
+        //     break;
+    infileSig.close();
+    }
+    H2->Draw();//只画最后一次
 //*******************draw the hist***************************************
     return 0;
 }
