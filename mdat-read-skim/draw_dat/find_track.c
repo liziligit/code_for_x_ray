@@ -14,21 +14,23 @@ int NX = 72, NY = 72;
 
 int extractId(string & nameId, string head,string tail)
 {
-//nameId like beam_1.pd1, get lenghth of all parts
-int total=nameId.length();
-int tailLength=tail.length();//for .mdat
-int headLength=head.length();//for out
-if(nameId.substr(0,headLength)!=head) return -1;
+    //nameId like beam_1.pd1, get lenghth of all parts
+    int total=nameId.length();
+    int tailLength=tail.length();//for .mdat
+    int headLength=head.length();//for out
+    if(nameId.substr(0,headLength)!=head) return -1;
 
-int dataLength=total-tailLength-headLength;
-string num=nameId.substr(headLength,dataLength);//获得从headlength开始，长度为dataLength的字符串
-return atoi(num.c_str());
+    int dataLength=total-tailLength-headLength;
+    string num=nameId.substr(headLength,dataLength);//获得从headlength开始，长度为dataLength的字符串
+    return atoi(num.c_str());
 }
 
 int find_track()
 {
     char pedefn[] = "../data/pede.txt";
     char beamfn[] = "../data/";
+    // char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
     /////get beamId in to list
     vector<string> name_id;
 
@@ -63,9 +65,9 @@ int find_track()
     //sort is not necessary if id is already  in order
     sort(idList.begin(), idList.end());
     for(std::vector<int>::size_type j=0;j<idList.size();j++)
-    {
-        cout << idList[j] << ' ';
-    }
+        {
+            cout << idList[j] << ' ';
+        }
     cout << "!!!" <<endl; 
     cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files" << " -> " << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
@@ -91,7 +93,7 @@ int find_track()
 
 //*******************draw the hist***************************************
     TCanvas *c1 = new TCanvas("c1","Canvas",0,0,1600,800);
-    H2 = new TH1F("H2","ADC",808 * iAccout, 0, 808 * iAccout);//一个个的增加
+    H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//一个个的增加
     int sumsig;
     char inDataFile[200];
     int iBin = 0;
@@ -101,6 +103,8 @@ int find_track()
         
         // char inDataFile[] = "../data/out5.mdat";
         sprintf(inDataFile,"../data/out%d.mdat", idList[fileId]);
+        // sprintf(inDataFile,"/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/out%d.mdat", idList[fileId]);
+        
 
         cout << inDataFile << endl;
 
@@ -133,21 +137,21 @@ int find_track()
         // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
         for(int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++)//&& i < iFrames+1
         {
-        sumsig = 0;
-        int _data_int[NX][NY];//unsigned short for .mdat, int for .dat
-        unsigned short _data_short[NX][NY];//unsigned short for .mdat, int for .dat
+            sumsig = 0;
+            int _data_int[NX][NY];//unsigned short for .mdat, int for .dat
+            unsigned short _data_short[NX][NY];//unsigned short for .mdat, int for .dat
 
-        infileSig.read((char *)(&_data_short), sizeof(_data_short));
+            infileSig.read((char *)(&_data_short), sizeof(_data_short));
 
-        for (int ii = 0; ii < NX; ii++){
-            for (int jj = 0; jj < NY; jj++){               
-                array3D[iFrameBegin][ii][jj] = _data_short[ii][jj] - meanPed[ii*72+jj];
-                sumsig = sumsig + array3D[iFrameBegin][ii][jj];               
+            for (int ii = 0; ii < NX; ii++){
+                for (int jj = 0; jj < NY; jj++){               
+                    array3D[iFrameBegin][ii][jj] = _data_short[ii][jj] - meanPed[ii*72+jj];
+                    sumsig = sumsig + array3D[iFrameBegin][ii][jj];               
                 }
             }
-        H2->SetBinContent(iBin,sumsig);
-        // cout<<sumsig<<endl;
-        iBin++;
+            H2->SetBinContent(iBin,sumsig);
+            // cout<<sumsig<<endl;
+            iBin++;
         }   
         // H2->Draw();
         // c1->Update(); 

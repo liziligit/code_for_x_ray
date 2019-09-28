@@ -35,6 +35,10 @@ void mdat_cut_pede_project()
     gStyle->SetOptStat(0);
     const int min2d = -10;
     const int max2d = 10;
+    const int projh2X_min = 0;
+    const int projh2X_max = 1000;
+    const int projh2Y_min = 0;
+    const int projh2Y_max = 1000;
     const int NX = 72;
     const int NY = 72;
     char str[30];
@@ -50,6 +54,20 @@ void mdat_cut_pede_project()
 
     // char inPdedFile[] = "/Users/lizili/Desktop/TM1_1_hpdaq_onechannel_mac/data/runData/500hv29_01/xpede_2901.txt";
     // char inDataFile[] = "/Users/lizili/Desktop/TM1_1_hpdaq_onechannel_mac/data/runData/500hv29_01/xbeam_1.pd1";
+
+    // char inPdedFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";
+    // char inDataFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/out12.mdat";
+
+    // char inPdedFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
+    // char inDataFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/out2.mdat";
+
+    // char inPdedFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    // char inDataFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2963.mdat";
+
+    // char inPdedFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
+    // char inDataFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/out2.mdat";
+
+    
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
 //////////////////////////////////////////////////identified the suffix of input file and iframes
@@ -60,23 +78,23 @@ suffix = strrchr(inDataFile, dot);
 
 if (strcmp(suffix,".mdat") == 0)//如果相等
 {
-cout << "suffix is .mdat" << endl;
-mode = 1;
+    cout << "suffix is .mdat" << endl;
+    mode = 1;
 }
 else if(strcmp(suffix,".dat") == 0)
 {
-cout << "suffix is .dat" << endl;
-mode = 2;
+    cout << "suffix is .dat" << endl;
+    mode = 2;
 }
 else if(strcmp(suffix,".pd1") == 0)
 {
-cout << "suffix is .pd1" << endl;
-mode = 3;
+    cout << "suffix is .pd1" << endl;
+    mode = 3;
 }
 else
 {
-cout << "error file type!" << endl;
-exit(1);//退出进程
+    cout << "error file type!" << endl;
+    exit(1);//退出进程
 }
 
 int _data0_int[NX][NY];//size of 1 frame for .dat-------->2/3
@@ -87,11 +105,11 @@ cout << "the size of file is: "<< fz << endl;
 int iFrames = 0;
 if(mode == 2)
 {
-iFrames = fz / sizeof(_data0_int);
+    iFrames = fz / sizeof(_data0_int);
 }
 else
 {
-iFrames = fz / sizeof(_data0_short);
+    iFrames = fz / sizeof(_data0_short);
 }
 // int iFrames = fz / sizeof(_data0);
 cout<<"iFrame num is: "<<iFrames<<endl;//808
@@ -143,8 +161,8 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
         // int ndata = 0;
         if(mode == 3)
         {
-        char header[1024];
-        infileSig.read(header, 1024);
+            char header[1024];
+            infileSig.read(header, 1024);
         }
         
         center_pad = new TPad("center_pad", "center_pad",0.0,0.0,0.6,0.6);
@@ -156,7 +174,7 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
 
         // while(infileSig.good() && i < iFrames+1){//&& i < iFrames+1
         // while(infileSig.good() && i < 200)
-        for(int i = 0; i < iFrames+1; i++)
+    for(int i = 0; i < iFrames+1; i++)
         {//&& ndata < iFrames+1
         H2 = new TH2F(Form("H2_%d", i),"Projection",72,0,72,72,0,72);
         sumsig = 0;
@@ -203,14 +221,14 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
         top_pad->cd();
         projh2X->SetFillColor(kBlue-2);
         projh2X->SetTitle("ProjectionX");
-        projh2X->GetYaxis()->SetRangeUser(0,1000);
+        projh2X->GetYaxis()->SetRangeUser(projh2X_min,projh2X_max);
         projh2X->Draw("bar");
 
         right_pad->cd();
         projh2Y->SetFillColor(kBlue-2);
         sprintf(str, "frame %d",i);
         projh2Y->SetTitle(str);
-        projh2Y->GetYaxis()->SetRangeUser(0,1000);
+        projh2Y->GetYaxis()->SetRangeUser(projh2Y_min,projh2Y_max);
         projh2Y->Draw("hbar"); 
         // ndata++;
             // char buf[100];
@@ -249,7 +267,7 @@ cout<<"iFrame num is: "<<iFrames<<endl;//808
 		// 			}//if( Key_input != 0 )			    		
 		// 		}//if(ch==32)				
 		// 	}//kbhit()
-        }
+    }
 
 // delete H2;//手动清空堆Heap中内存
 // H2 = NULL;//使堆Heap的指针指向空
