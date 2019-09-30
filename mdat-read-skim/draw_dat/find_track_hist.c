@@ -26,7 +26,7 @@ int extractId(string &nameId, string head, string tail)
     return atoi(num.c_str());
 }
 
-int find_track()
+int find_track_hist()
 {
     char pedefn[] = "../data/pede.txt";
     char beamfn[] = "../data/";

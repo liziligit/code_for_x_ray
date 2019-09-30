@@ -32,7 +32,8 @@ int find_track_save_image()
     char beamfn[] = "../data/";
     // char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";
     // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
-    /////get beamId in to list
+
+    //*******************get beamId in to list**********
     vector<string> name_id;
 
     DIR *dir;
@@ -73,9 +74,9 @@ int find_track_save_image()
     cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files"
          << " -> "
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
-
-    int iStart_num = 4;
-    int iAccout = 1;
+    //*******************get beamId in to list****************
+    int iStart_num = 4; //the start id of vector<>
+    int iAccout = 1;    //How many files to analysis
 
     cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
     ifstream infilePede(pedefn);
@@ -156,8 +157,8 @@ int find_track_save_image()
                 }
             }
             H2->SetBinContent(iBin, sumsig);
-            H2->SetLineWidth(1);//最少为1个pixel
-            // cout<<sumsig<<endl;
+            H2->SetLineWidth(1); //最少为1个pixel
+            cout<<sumsig<<endl;
             iBin++;
         }
         // H2->Draw();
@@ -169,6 +170,6 @@ int find_track_save_image()
     }
     H2->Draw(); //只画最后一次
     // c1->SaveAs(TString::Format("./55-1/55-1-%d.pdf", idList[iStart_num]));
-                //*******************draw the hist***************************************
+    //*******************draw the hist***************************************
     return 0;
 }

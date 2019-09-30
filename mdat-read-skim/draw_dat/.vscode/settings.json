@@ -29,5 +29,8 @@
         "python":"python3 $fileName",
         "c":"root -l $fileName",
         "cpp":"g++ $fileName -o $fileNameWithoutExt && $fileNameWithoutExt",
+        },
+        "files.associations": {
+            "ostream": "c"
         }
 }
