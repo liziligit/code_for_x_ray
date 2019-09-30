@@ -76,7 +76,9 @@ int find_track_hist()
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     int iStart_num = 4;
-    int iAccout = 2;
+    int iAccout = 1;
+
+    int iAccount_filter = 0;
 
     cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
     ifstream infilePede(pedefn);
@@ -101,13 +103,14 @@ int find_track_hist()
     int sumsig;
     char inDataFile[200];
     int iBin = 0;
-
+    //extract totle ADC of each frame
+    vector<double> aFrames_one_mdat;
+    //extract filter ADC of each frame
+    vector<double> filter_iFrames_one_mdat;
+    ofstream of;
+    of.open(Output);
     for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     {
-        //extract totle ADC of each frame
-        vector<double> aFrames_one_mdat;
-
-        // char inDataFile[] = "../data/out5.mdat";
         sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
         // sprintf(inDataFile,"/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/out%d.mdat", idList[fileId]);
 
@@ -122,7 +125,7 @@ int find_track_hist()
         // cout << "the size of file is: "<< fz << endl;
         int iFrames = 0;
         iFrames = fz / sizeof(_data0_short);
-        cout << "iFrame num is: " << iFrames << endl; //758
+        cout << "iFrame num is: " << iFrames << endl; //808
         //*******************count the number of iFrames******
 
         //*******************for 3D array*******************************
@@ -141,8 +144,7 @@ int find_track_hist()
             }
         }
         //*******************for 3D array*******************************
-        ofstream of;
-        of.open(Output);
+
         // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
         for (int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++) //&& i < iFrames+1
         {
@@ -160,24 +162,56 @@ int find_track_hist()
                     sumsig = sumsig + array3D[iFrameBegin][ii][jj];
                 }
             }
-            H2->SetBinContent(iBin, sumsig);
-            H2->SetLineWidth(1); //最少为1个pixel
+            H2->SetBinContent(iBin, sumsig);           
             aFrames_one_mdat.push_back(sumsig);
             // cout<< iFrameBegin << " " << sumsig << " : " << aFrames_one_mdat[iFrameBegin] << endl;
-            of<< iFrameBegin << " " << sumsig << " " << aFrames_one_mdat[iFrameBegin] << endl;
+            of << iFrameBegin << " " << sumsig << endl;
             iBin++;
+            iAccount_filter++;
         }
-        // H2->Draw();
-        // c1->Update();
-        // sleep(1);//second
-        // if (gSystem->ProcessEvents())//不能去除，否则没有动画
-        //     break;
+        //*******************filter frames***************************************
+        // for (int k = (iFrames + 1)*(iAccount_filter-1); k < (iFrames + 1)* iAccount_filter; k++)
+        for (int k = 0; k < iFrames + 1; k++)
+        {
+            // if (k > (iFrames + 1)*(iAccount_filter-1)+2 && k < (iFrames + 1)* iAccount_filter - 3)
+            if (k > 2 && k < (iFrames + 1) - 3)
+            {
+                if (1000 < aFrames_one_mdat[k] &&
+                    aFrames_one_mdat[k - 3] < aFrames_one_mdat[k] &&
+                    aFrames_one_mdat[k - 2] < aFrames_one_mdat[k] &&
+                    aFrames_one_mdat[k - 1] < aFrames_one_mdat[k] && ///
+                    aFrames_one_mdat[k + 1] < aFrames_one_mdat[k] &&
+                    aFrames_one_mdat[k + 2] < aFrames_one_mdat[k] &&
+                    aFrames_one_mdat[k + 3] < aFrames_one_mdat[k] && ///
+                    aFrames_one_mdat[k + 3] < aFrames_one_mdat[k + 1] &&
+                    // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 1] &&
+                    // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 2] &&
+                    aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 1] &&
+                    // aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 2] &&
+                    aFrames_one_mdat[k] - aFrames_one_mdat[k + 3] > 800)
+                {
+                    filter_iFrames_one_mdat.push_back(k);
+                    cout << k << " " << aFrames_one_mdat[k] << endl;
+                }
+            }
+        }
+        cout << filter_iFrames_one_mdat.size() << endl;
+        //*******************filter frames***************************************
         infileSig.close();
-        of.close();
     }
-
-    H2->Draw(); //只画最后一次
-    // c1->SaveAs(TString::Format("./55-1/55-1-%d.pdf", idList[iStart_num]));
+    H2->SetLineWidth(1); //最少为1个pixel
+    H2->Draw();
+    // create markers of same colors
+    for (int j = 0; j < filter_iFrames_one_mdat.size(); j++)
+    {
+        TMarker *m = new TMarker(filter_iFrames_one_mdat[j], aFrames_one_mdat[filter_iFrames_one_mdat[j]], 3); //x,y,marker_style
+        m->SetMarkerSize(1);
+        m->SetMarkerColor(kRed);
+        m->Draw();
+    }
+    c1->SaveAs(TString::Format("./55-1/55-1-%d.root", idList[iStart_num]));
+    // H2->Draw(); //只画最后一次
+    of.close();
     //*******************draw the hist***************************************
     return 0;
 }
