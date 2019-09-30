@@ -31,6 +31,10 @@
         "cpp":"g++ $fileName -o $fileNameWithoutExt && $fileNameWithoutExt",
         },
         "files.associations": {
-            "ostream": "c"
+            "ostream": "c",
+            "vector": "c",
+            "iosfwd": "c",
+            "iterator": "c",
+            "iostream": "cpp"
         }
 }

@@ -30,6 +30,7 @@ int find_track_hist()
 {
     char pedefn[] = "../data/pede.txt";
     char beamfn[] = "../data/";
+    char Output[] = "./output.txt"; //for debug
     // char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";
     // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
     /////get beamId in to list
@@ -75,7 +76,7 @@ int find_track_hist()
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     int iStart_num = 4;
-    int iAccout = 1;
+    int iAccout = 2;
 
     cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
     ifstream infilePede(pedefn);
@@ -103,6 +104,8 @@ int find_track_hist()
 
     for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     {
+        //extract totle ADC of each frame
+        vector<double> aFrames_one_mdat;
 
         // char inDataFile[] = "../data/out5.mdat";
         sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
@@ -138,6 +141,8 @@ int find_track_hist()
             }
         }
         //*******************for 3D array*******************************
+        ofstream of;
+        of.open(Output);
         // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
         for (int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++) //&& i < iFrames+1
         {
@@ -156,8 +161,10 @@ int find_track_hist()
                 }
             }
             H2->SetBinContent(iBin, sumsig);
-            H2->SetLineWidth(1);//最少为1个pixel
-            // cout<<sumsig<<endl;
+            H2->SetLineWidth(1); //最少为1个pixel
+            aFrames_one_mdat.push_back(sumsig);
+            // cout<< iFrameBegin << " " << sumsig << " : " << aFrames_one_mdat[iFrameBegin] << endl;
+            of<< iFrameBegin << " " << sumsig << " " << aFrames_one_mdat[iFrameBegin] << endl;
             iBin++;
         }
         // H2->Draw();
@@ -166,9 +173,11 @@ int find_track_hist()
         // if (gSystem->ProcessEvents())//不能去除，否则没有动画
         //     break;
         infileSig.close();
+        of.close();
     }
+
     H2->Draw(); //只画最后一次
-    c1->SaveAs(TString::Format("./55-1/55-1-%d.pdf", idList[iStart_num]));
-                //*******************draw the hist***************************************
+    // c1->SaveAs(TString::Format("./55-1/55-1-%d.pdf", idList[iStart_num]));
+    //*******************draw the hist***************************************
     return 0;
 }
