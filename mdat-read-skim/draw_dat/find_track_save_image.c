@@ -26,7 +26,7 @@ int extractId(string &nameId, string head, string tail)
     return atoi(num.c_str());
 }
 
-int find_track()
+int find_track_save_image()
 {
     char pedefn[] = "../data/pede.txt";
     char beamfn[] = "../data/";
@@ -168,7 +168,7 @@ int find_track()
         infileSig.close();
     }
     H2->Draw(); //只画最后一次
-    c1->SaveAs(TString::Format("./55-1/55-1-%d.pdf", idList[iStart_num]));
+    // c1->SaveAs(TString::Format("./55-1/55-1-%d.pdf", idList[iStart_num]));
                 //*******************draw the hist***************************************
     return 0;
 }

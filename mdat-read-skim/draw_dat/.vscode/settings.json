@@ -22,6 +22,7 @@
     // },
     "code-runner.runInTerminal": true,
     // "C_Cpp.default.cppStandard": "c++11",
+    "editor.formatOnType": true,//按下分号自动帮你格式化
     "code-runner.executorMap":{
         //g++ for *.cpp, gcc for *.c, $fullFileName, cd $dir,
         // "cpp":"cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
