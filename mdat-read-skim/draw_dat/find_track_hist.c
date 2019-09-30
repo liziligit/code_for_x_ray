@@ -76,9 +76,9 @@ int find_track_hist()
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     int iStart_num = 4;
-    int iAccout = 1;
+    int iAccout = 3;
 
-    int iAccount_filter = 0;
+    // int iAccount_filter = 0;
 
     cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
     ifstream infilePede(pedefn);
@@ -103,6 +103,7 @@ int find_track_hist()
     int sumsig;
     char inDataFile[200];
     int iBin = 0;
+    int iFrames;
     //extract totle ADC of each frame
     vector<double> aFrames_one_mdat;
     //extract filter ADC of each frame
@@ -123,7 +124,8 @@ int find_track_hist()
 
         int fz = file_loder::file_size(inDataFile);
         // cout << "the size of file is: "<< fz << endl;
-        int iFrames = 0;
+        // int iFrames = 0;
+        iFrames = 0;
         iFrames = fz / sizeof(_data0_short);
         cout << "iFrame num is: " << iFrames << endl; //808
         //*******************count the number of iFrames******
@@ -162,43 +164,43 @@ int find_track_hist()
                     sumsig = sumsig + array3D[iFrameBegin][ii][jj];
                 }
             }
-            H2->SetBinContent(iBin, sumsig);           
+            H2->SetBinContent(iBin, sumsig);
             aFrames_one_mdat.push_back(sumsig);
             // cout<< iFrameBegin << " " << sumsig << " : " << aFrames_one_mdat[iFrameBegin] << endl;
             of << iFrameBegin << " " << sumsig << endl;
             iBin++;
-            iAccount_filter++;
+            // iAccount_filter++;
         }
-        //*******************filter frames***************************************
-        // for (int k = (iFrames + 1)*(iAccount_filter-1); k < (iFrames + 1)* iAccount_filter; k++)
-        for (int k = 0; k < iFrames + 1; k++)
-        {
-            // if (k > (iFrames + 1)*(iAccount_filter-1)+2 && k < (iFrames + 1)* iAccount_filter - 3)
-            if (k > 2 && k < (iFrames + 1) - 3)
-            {
-                if (1000 < aFrames_one_mdat[k] &&
-                    aFrames_one_mdat[k - 3] < aFrames_one_mdat[k] &&
-                    aFrames_one_mdat[k - 2] < aFrames_one_mdat[k] &&
-                    aFrames_one_mdat[k - 1] < aFrames_one_mdat[k] && ///
-                    aFrames_one_mdat[k + 1] < aFrames_one_mdat[k] &&
-                    aFrames_one_mdat[k + 2] < aFrames_one_mdat[k] &&
-                    aFrames_one_mdat[k + 3] < aFrames_one_mdat[k] && ///
-                    aFrames_one_mdat[k + 3] < aFrames_one_mdat[k + 1] &&
-                    // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 1] &&
-                    // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 2] &&
-                    aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 1] &&
-                    // aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 2] &&
-                    aFrames_one_mdat[k] - aFrames_one_mdat[k + 3] > 800)
-                {
-                    filter_iFrames_one_mdat.push_back(k);
-                    cout << k << " " << aFrames_one_mdat[k] << endl;
-                }
-            }
-        }
-        cout << filter_iFrames_one_mdat.size() << endl;
-        //*******************filter frames***************************************
         infileSig.close();
     }
+    //*******************filter frames***************************************
+    // for (int k = (iFrames + 1)*(iAccount_filter-1); k < (iFrames + 1)* iAccount_filter; k++)
+    for (int k = 0; k < (iFrames + 1) * iAccout; k++)
+    {
+        // if (k > (iFrames + 1)*(iAccount_filter-1)+2 && k < (iFrames + 1)* iAccount_filter - 3)
+        if (k > 2 && k < (iFrames + 1) * iAccout - 3)
+        {
+            if (1000 < aFrames_one_mdat[k] &&
+                aFrames_one_mdat[k - 3] < aFrames_one_mdat[k] &&
+                aFrames_one_mdat[k - 2] < aFrames_one_mdat[k] &&
+                aFrames_one_mdat[k - 1] < aFrames_one_mdat[k] && ///
+                aFrames_one_mdat[k + 1] < aFrames_one_mdat[k] &&
+                aFrames_one_mdat[k + 2] < aFrames_one_mdat[k] &&
+                aFrames_one_mdat[k + 3] < aFrames_one_mdat[k] && ///
+                aFrames_one_mdat[k + 3] < aFrames_one_mdat[k + 1] &&
+                // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 1] &&
+                // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 2] &&
+                aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 1] &&
+                // aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 2] &&
+                aFrames_one_mdat[k] - aFrames_one_mdat[k + 3] > 800)
+            {
+                filter_iFrames_one_mdat.push_back(k);
+                cout << k << " " << aFrames_one_mdat[k] << endl;
+            }
+        }
+    }
+    cout << filter_iFrames_one_mdat.size() << endl;
+    //*******************filter frames***************************************
     H2->SetLineWidth(1); //最少为1个pixel
     H2->Draw();
     // create markers of same colors
@@ -209,7 +211,7 @@ int find_track_hist()
         m->SetMarkerColor(kRed);
         m->Draw();
     }
-    c1->SaveAs(TString::Format("./55-1/55-1-%d.root", idList[iStart_num]));
+    c1->SaveAs(TString::Format("./55-1/55-1-%d_%d.root", idList[iStart_num], idList[iStart_num + iAccout - 1]));
     // H2->Draw(); //只画最后一次
     of.close();
     //*******************draw the hist***************************************
