@@ -76,7 +76,7 @@ int find_track_hist()
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     int iStart_num = 4;
-    int iAccout = 3;
+    int iAccout = 4;
 
     // int iAccount_filter = 0;
 
@@ -181,6 +181,8 @@ int find_track_hist()
         if (k > 2 && k < (iFrames + 1) * iAccout - 3)
         {
             if (1000 < aFrames_one_mdat[k] &&
+                aFrames_one_mdat[k] - aFrames_one_mdat[k + 3] > 200 &&
+                aFrames_one_mdat[k] - aFrames_one_mdat[k - 1] > 700 &&
                 aFrames_one_mdat[k - 3] < aFrames_one_mdat[k] &&
                 aFrames_one_mdat[k - 2] < aFrames_one_mdat[k] &&
                 aFrames_one_mdat[k - 1] < aFrames_one_mdat[k] && ///
@@ -190,9 +192,8 @@ int find_track_hist()
                 aFrames_one_mdat[k + 3] < aFrames_one_mdat[k + 1] &&
                 // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 1] &&
                 // aFrames_one_mdat[k - 2] < aFrames_one_mdat[k + 2] &&
-                aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 1] &&
-                // aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 2] &&
-                aFrames_one_mdat[k] - aFrames_one_mdat[k + 3] > 800)
+                aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 1])
+                // aFrames_one_mdat[k - 3] < aFrames_one_mdat[k + 2] &&)
             {
                 filter_iFrames_one_mdat.push_back(k);
                 cout << k << " " << aFrames_one_mdat[k] << endl;
