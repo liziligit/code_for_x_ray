@@ -39,6 +39,7 @@
             "random": "c",
             "fstream": "c",
             "locale": "c",
-            "*.tcc": "c"
+            "*.tcc": "c",
+            "string": "c"
         }
 }

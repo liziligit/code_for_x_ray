@@ -9,6 +9,9 @@
 #include <unistd.h> //sleep(3);second
 using namespace std;
 
+TList *l = 0;
+void HighlightHisto(TVirtualPad *pad, TObject *obj, Int_t ihp, Int_t y);
+
 int extractId(string &nameId, string head, string tail)
 {
     //nameId like beam_1.pd1, get lenghth of all parts
@@ -23,9 +26,18 @@ int extractId(string &nameId, string head, string tail)
     return atoi(num.c_str());
 }
 
-int find_track_hist()
+void find_track_hist_highlight()
 {
+    char str[30];
+    // gStyle->SetOptStat(0);//隐藏所有statistics box
+    const int min2d = -10;
+    const int max2d = 10;
+
     TH1F *H2;
+    TH2F *h;
+
+    l = new TList();
+
     int NX = 72, NY = 72;
     char pedefn[] = "../data/pede.txt";
     char beamfn[] = "../data/";
@@ -97,7 +109,7 @@ int find_track_hist()
     //*******************read Pede file************************
 
     //*******************draw the hist***************************************
-    TCanvas *c1 = new TCanvas("c1", "Canvas", 0, 0, 1800, 400);
+    TCanvas *c1 = new TCanvas("c1", "Canvas", 0, 0, 1600, 400);
     H2 = new TH1F("H2", "ADC", 809 * iAccout, 0, 809 * iAccout); //一个个的增加
     int sumsig;
     char inDataFile[200];
@@ -149,6 +161,13 @@ int find_track_hist()
         // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
         for (int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++) //&& i < iFrames+1
         {
+            h = new TH2F(Form("h_%d", iFrameBegin), "", 72, 0, 72, 72, 0, 72);
+            h->GetZaxis()->SetRangeUser(min2d, max2d);
+            h->SetStats(0);//delete the statistics box for a histogram TH2* h
+
+            sprintf(str, "frame %d", iFrameBegin);
+            h->SetTitle(str);
+
             sumsig = 0;
             int _data_int[NX][NY];              //unsigned short for .mdat, int for .dat
             unsigned short _data_short[NX][NY]; //unsigned short for .mdat, int for .dat
@@ -161,10 +180,12 @@ int find_track_hist()
                 {
                     array3D[iFrameBegin][ii][jj] = _data_short[ii][jj] - meanPed[ii * 72 + jj];
                     sumsig = sumsig + array3D[iFrameBegin][ii][jj];
+                    h->Fill(ii, jj, array3D[iFrameBegin][ii][jj]);
                 }
             }
             H2->SetBinContent(iBin, sumsig);
             aFrames_one_mdat.push_back(sumsig);
+            l->Add(h);
             // cout<< iFrameBegin << " " << sumsig << " : " << aFrames_one_mdat[iFrameBegin] << endl;
             of << iFrameBegin << " " << sumsig << endl;
             iBin++;
@@ -203,6 +224,22 @@ int find_track_hist()
     //*******************filter frames***************************************
     H2->SetLineWidth(1); //最少为1个pixel
     H2->Draw();
+
+    auto Pad = new TPad("Pad", "Pad", 0.85, 0.45, 1.0, 1.0);
+    Pad->SetFillColor(kBlue - 10);
+
+    Pad->Draw();
+    Pad->cd();
+    auto info = new TText(0.5, 0.5, "please move the mouse over the graPad");
+    info->SetTextAlign(22);
+    info->Draw();
+
+    c1->Update();
+    c1->cd();
+
+    H2->SetHighlight();
+    c1->HighlightConnect("HighlightHisto(TVirtualPad*,TObject*,Int_t,Int_t)");
+
     // create markers of same colors
     for (int j = 0; j < filter_iFrames_one_mdat.size(); j++)
     {
@@ -215,5 +252,23 @@ int find_track_hist()
     // H2->Draw(); //只画最后一次
     of.close();
     //*******************draw the hist***************************************
-    return 0;
+    // return 0;
+}
+
+void HighlightHisto(TVirtualPad *pad, TObject *obj, Int_t ihp, Int_t y)
+{
+    auto Pad = (TVirtualPad *)pad->FindObject("Pad");
+    if (!Pad)
+        return;
+
+    if (ihp == -1)
+    { // after highlight disabled
+        Pad->Clear();
+        return;
+    }
+    
+    Pad->cd();
+    l->At(ihp)->Draw("COLZ");
+    gPad->Update();
+
 }
