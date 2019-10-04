@@ -75,7 +75,7 @@ int find_track_hist()
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     int iStart_num = 4;
-    int iAccout = 1;
+    int iAccout = 3;
 
     // int iAccount_filter = 0;
 
@@ -131,7 +131,7 @@ int find_track_hist()
 
         //*******************for 3D array*******************************
         vector<vector<vector<float>>> array3D;
-        int DEPTH = iFrames + 1;
+        int DEPTH = iFrames;
         int HEIGHT = NY;
         int LONGTH = NX;
         // 初始化
@@ -147,7 +147,7 @@ int find_track_hist()
         //*******************for 3D array*******************************
 
         // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
-        for (int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++) //&& i < iFrames+1
+        for (int iFrameBegin = 0; iFrameBegin < iFrames; iFrameBegin++) //&& i < iFrames+1
         {
             sumsig = 0;
             int _data_int[NX][NY];              //unsigned short for .mdat, int for .dat
@@ -174,10 +174,10 @@ int find_track_hist()
     }
     //*******************filter frames***************************************
     // for (int k = (iFrames + 1)*(iAccount_filter-1); k < (iFrames + 1)* iAccount_filter; k++)
-    for (int k = 0; k < (iFrames + 1) * iAccout; k++)
+    for (int k = 0; k < (iFrames) * iAccout; k++)
     {
         // if (k > (iFrames + 1)*(iAccount_filter-1)+2 && k < (iFrames + 1)* iAccount_filter - 3)
-        if (k > 2 && k < (iFrames + 1) * iAccout - 3)
+        if (k > 2 && k < (iFrames) * iAccout - 3)
         {
             if (1000 < aFrames_one_mdat[k] &&
                 aFrames_one_mdat[k] - aFrames_one_mdat[k + 3] > 200 &&

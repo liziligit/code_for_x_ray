@@ -45,8 +45,8 @@ void mdat_cut_pede_project()
     int sumsig;
     int mode = 0;
     int ch;
-    // char inPdedFile[] = "../data/pede.txt";
-    // char inDataFile[] = "../data/out5.mdat";
+    char inPdedFile[] = "../data/pede.txt";
+    char inDataFile[] = "../data/out5.mdat";
     // char inDataFile[] = "../data/2outframe.dat";
 
     // char inPdedFile[] = "/Users/lizili/Desktop/CSNS/20190917_TM1_1_hpdaq_onechannel_just_code/data/runData/cnsn_20190917ok/xpede_2.txt";
@@ -55,8 +55,8 @@ void mdat_cut_pede_project()
     // char inPdedFile[] = "/Users/lizili/Desktop/TM1_1_hpdaq_onechannel_mac/data/runData/500hv29_01/xpede_2901.txt";
     // char inDataFile[] = "/Users/lizili/Desktop/TM1_1_hpdaq_onechannel_mac/data/runData/500hv29_01/xbeam_1.pd1";
 
-    char inPdedFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";//数据有问题
-    char inDataFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/out2031.mdat";
+    // char inPdedFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";//数据有问题
+    // char inDataFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/out2031.mdat";
 
     // char inPdedFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
     // char inDataFile[]="/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/out2.mdat";
@@ -144,7 +144,8 @@ void mdat_cut_pede_project()
 
     //////////////////////////////////////////////////for 3D array
     vector<vector<vector<float>>> array3D;
-    int DEPTH = iFrames + 1;
+    // int DEPTH = iFrames + 1;
+    int DEPTH = iFrames;
     int HEIGHT = NY;
     int LONGTH = NX;
     // 初始化
@@ -174,7 +175,8 @@ void mdat_cut_pede_project()
 
     // while(infileSig.good() && i < iFrames+1){//&& i < iFrames+1
     // while(infileSig.good() && i < 200)
-    for (int i = 0; i < iFrames + 1; i++)
+    // for (int i = 0; i < iFrames + 1; i++)
+    for (int i = 0; i < iFrames; i++)
     { //&& ndata < iFrames+1
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         sumsig = 0;

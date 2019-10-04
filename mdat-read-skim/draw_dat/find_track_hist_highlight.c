@@ -87,9 +87,26 @@ void find_track_hist_highlight()
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     int iStart_num = 4;
-    int iAccout = 1;
+    int iAccout = 2;
+    int fileAcount = 0;
 
-    // int iAccount_filter = 0;
+    //*******************for 3D array*******************************
+        vector<vector<vector<float>>> array3D;
+        // int DEPTH = iFrames;
+        int DEPTH = 808 * iAccout;
+        int HEIGHT = NY;
+        int LONGTH = NX;
+        // 初始化
+        array3D.resize(DEPTH); //1
+        for (int i = 0; i < DEPTH; ++i)
+        {                              //1
+            array3D[i].resize(HEIGHT); //2
+            for (int j = 0; j < HEIGHT; ++j)
+            {                                 //2
+                array3D[i][j].resize(LONGTH); //3
+            }
+        }
+        //*******************for 3D array*******************************
 
     cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
     ifstream infilePede(pedefn);
@@ -110,10 +127,10 @@ void find_track_hist_highlight()
 
     //*******************draw the hist***************************************
     TCanvas *c1 = new TCanvas("c1", "Canvas", 0, 0, 1600, 400);
-    H2 = new TH1F("H2", "ADC", 809 * iAccout, 0, 809 * iAccout); //一个个的增加
+    H2 = new TH1F("H2", "ADC", 808 * iAccout, 0, 808 * iAccout); //一个个的增加
     int sumsig;
     char inDataFile[200];
-    int iBin = 0;
+    int iBin = 1;
     int iFrames;
     //extract totle ADC of each frame
     vector<double> aFrames_one_mdat;
@@ -142,30 +159,33 @@ void find_track_hist_highlight()
         //*******************count the number of iFrames******
 
         //*******************for 3D array*******************************
-        vector<vector<vector<float>>> array3D;
-        int DEPTH = iFrames + 1;
-        int HEIGHT = NY;
-        int LONGTH = NX;
-        // 初始化
-        array3D.resize(DEPTH); //1
-        for (int i = 0; i < DEPTH; ++i)
-        {                              //1
-            array3D[i].resize(HEIGHT); //2
-            for (int j = 0; j < HEIGHT; ++j)
-            {                                 //2
-                array3D[i][j].resize(LONGTH); //3
-            }
-        }
+        // vector<vector<vector<float>>> array3D;
+        // // int DEPTH = iFrames;
+        // int DEPTH = iFrames;
+        // int HEIGHT = NY;
+        // int LONGTH = NX;
+        // // 初始化
+        // array3D.resize(DEPTH); //1
+        // for (int i = 0; i < DEPTH; ++i)
+        // {                              //1
+        //     array3D[i].resize(HEIGHT); //2
+        //     for (int j = 0; j < HEIGHT; ++j)
+        //     {                                 //2
+        //         array3D[i][j].resize(LONGTH); //3
+        //     }
+        // }
         //*******************for 3D array*******************************
 
         // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
-        for (int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++) //&& i < iFrames+1
+        // for (int iFrameBegin = 0; iFrameBegin < iFrames; iFrameBegin++) //&& i < iFrames+1
+        for (int iFrameBegin = iFrames * fileAcount; iFrameBegin < iFrames * fileAcount + iFrames; iFrameBegin++) //&& i < iFrames+1
         {
             h = new TH2F(Form("h_%d", iFrameBegin), "", 72, 0, 72, 72, 0, 72);
             h->GetZaxis()->SetRangeUser(min2d, max2d);
             h->SetStats(0);//delete the statistics box for a histogram TH2* h
-
-            sprintf(str, "frame %d", iFrameBegin);
+            // cout << iFrameBegin << endl;
+            // sprintf(str, "beam_%d frame %d", idList[fileId], iFrameBegin);
+            sprintf(str, "beam_%d frame %d", idList[fileId], iFrameBegin % iFrames);
             h->SetTitle(str);
 
             sumsig = 0;
@@ -191,14 +211,15 @@ void find_track_hist_highlight()
             iBin++;
             // iAccount_filter++;
         }
+        fileAcount++;
         infileSig.close();
     }
     //*******************filter frames***************************************
     // for (int k = (iFrames + 1)*(iAccount_filter-1); k < (iFrames + 1)* iAccount_filter; k++)
-    for (int k = 0; k < (iFrames + 1) * iAccout; k++)
+    for (int k = 0; k < (iFrames) * iAccout; k++)
     {
         // if (k > (iFrames + 1)*(iAccount_filter-1)+2 && k < (iFrames + 1)* iAccount_filter - 3)
-        if (k > 2 && k < (iFrames + 1) * iAccout - 3)
+        if (k > 2 && k < (iFrames) * iAccout - 3)
         {
             if (1000 < aFrames_one_mdat[k] &&
                 aFrames_one_mdat[k] - aFrames_one_mdat[k + 3] > 200 &&

@@ -1,25 +1,4 @@
 {
-    // "files.associations": {
-        // "istream": "cpp",
-        // "*.tcc": "cpp",
-        // "ios": "cpp",
-        // "iostream": "cpp",
-        // "new": "cpp",
-        // "iosfwd": "cpp",
-        // "vector": "cpp",
-        // "algorithm": "cpp",
-        // "random": "cpp",
-        // "ostream": "cpp",
-        // "fstream": "cpp",
-        // "locale": "cpp",
-        // "sstream": "cpp",
-        // "draw2dopt.C": "cpp",
-        // "__bit_reference": "cpp",
-        // "bitset": "cpp",
-        // "chrono": "cpp",
-        // "unordered_map": "cpp",
-        // "typeinfo": "cpp"
-    // },
     "code-runner.runInTerminal": true,
     // "C_Cpp.default.cppStandard": "c++11",
     "editor.formatOnType": true,//按下分号自动帮你格式化

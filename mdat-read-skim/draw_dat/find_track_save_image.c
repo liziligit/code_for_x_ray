@@ -125,7 +125,7 @@ int find_track_save_image()
 
         //*******************for 3D array*******************************
         vector<vector<vector<float>>> array3D;
-        int DEPTH = iFrames + 1;
+        int DEPTH = iFrames;
         int HEIGHT = NY;
         int LONGTH = NX;
         // 初始化
@@ -140,7 +140,7 @@ int find_track_save_image()
         }
         //*******************for 3D array*******************************
         // H2 = new TH1F("H2","ADC",809 * iAccout, 0, 809 * iAccout);//只有一团
-        for (int iFrameBegin = 0; iFrameBegin < iFrames + 1; iFrameBegin++) //&& i < iFrames+1
+        for (int iFrameBegin = 0; iFrameBegin < iFrames; iFrameBegin++) //&& i < iFrames+1
         {
             sumsig = 0;
             int _data_int[NX][NY];              //unsigned short for .mdat, int for .dat
