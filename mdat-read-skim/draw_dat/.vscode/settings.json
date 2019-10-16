@@ -19,6 +19,8 @@
             "fstream": "c",
             "locale": "c",
             "*.tcc": "c",
-            "string": "c"
+            "string": "c",
+            "loader_file.h": "c",
+            "string.h": "c"
         }
 }
