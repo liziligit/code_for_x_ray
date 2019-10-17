@@ -21,6 +21,8 @@
             "*.tcc": "c",
             "string": "c",
             "loader_file.h": "c",
-            "string.h": "c"
+            "string.h": "c",
+            "__split_buffer": "cpp",
+            "deque": "cpp"
         }
 }
