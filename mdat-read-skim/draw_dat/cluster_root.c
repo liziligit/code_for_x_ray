@@ -73,7 +73,8 @@ int cluster_root()
 
     const int min2d = 0;
     const int max2d = 1;
-    const int mini_cluster_size = 4;
+    const int mini_cluster_size_boundary = 1;//边界像素个数满足一定数量才处理
+    const int mini_cluster_size_area = 2;//中间像素个数满足一定数量才处理
     binArray a;
     a.nRow = 15;
     a.nCol = 15;
@@ -152,6 +153,20 @@ int cluster_root()
     a.getP(8, 14)[0] = 1;
     a.getP(9, 14)[0] = 1;
 
+    a.getP(1, 12)[0] = 1;
+    a.getP(2, 12)[0] = 1;
+    a.getP(3, 12)[0] = 1;
+
+    a.getP(11, 7)[0] = 1;
+    a.getP(12, 7)[0] = 1;
+
+    a.getP(14, 5)[0] = 1;
+    a.getP(14, 6)[0] = 1;
+
+    a.getP(14, 9)[0] = 1;
+
+    a.getP(6, 12)[0] = 1;
+
     vector<int> vx;
     vector<vector<int> > vc; //多维向量
     vc.clear();
@@ -188,10 +203,11 @@ int cluster_root()
     H2->SetStats(0);
     H2->Draw("box");
 
+//*******************del boundary and mini isolate cluster*******************************
     cout << "cluster No is: " << vc.size() << endl;
     for (int i = 0; i < vc.size(); i++) //vc中的vector元素的个数
     {
-        if (vc[i].size() / 2 >= mini_cluster_size) //像素个数满足一定数量
+        if ( vc[i].size() / 2 >= mini_cluster_size_boundary ) //边界有至少一个像素，则删除
         {
             cout << endl;
             cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
@@ -200,29 +216,45 @@ int cluster_root()
                 
                 if (j % 2 == 0)
                 {
-                    // cout << vc[i].size();
                     cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
+                    if(vc[i].size() / 2 <= mini_cluster_size_area){//像素个数少于mini_cluster_size_area，则删除
+                        ivec2[vc[i][j]][vc[i][j + 1]] = 0;
+                        cout<< "x ";
+                    }
+                    
                 }
                 if(vc[i][j]==0 || vc[i][j]==a.nCol-1)//ok
+                {
+                    cout << "xxx ";
+                    for (int j = 0; j < vc[i].size(); j++)
                     {
-                        cout << "xxxxxxxx ";
-                        for (int j = 0; j < vc[i].size(); j++){
-                            if (j % 2 == 0){
-                                ivec2[vc[i][j]][vc[i][j + 1]] = 0;
-                                // cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
-                            }
+                        if (j % 2 == 0)
+                        {
+                            ivec2[vc[i][j]][vc[i][j + 1]] = 0;
                         }
-                        break;//不显示后续的坐标
                     }
+                    // break;//不显示后续的坐标
+                }
             }
         }
+
+        // if(vc[i].size() / 2 <= mini_cluster_size_area) //像素个数少于mini_cluster_size_area，则删除
+        // {
+        //     for (int j = 0; j < vc[i].size(); j++){
+        //         if (j % 2 == 0){
+        //             cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")"<< "x ";
+        //             ivec2[vc[i][j]][vc[i][j + 1]] = 0;
+        //         }
+        //     }
+        // }
     }
     cout << endl;
+//*******************ddel boundary and mini isolate cluster*******************************
 
     cout << "cluster No is: " << vc.size() << endl;
     for (int i = 0; i < vc.size(); i++) //vc中的vector元素的个数
     {
-        if (vc[i].size() / 2 >= mini_cluster_size) //像素个数满足一定数量
+        if (vc[i].size() / 2 >= mini_cluster_size_boundary) //像素个数满足一定数量才处理
         {
             cout << endl;
             cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
@@ -241,9 +273,7 @@ int cluster_root()
     {
         for (int j = 0; j < a.nCol; j++)
         {
-            // H3->Fill(i, j, a.getP(i, j)[0]);
             H3->Fill(i, j, ivec2[i][j]);
-            // cout << ivec2[i][j] <<endl;
         }
     }
 
@@ -252,6 +282,10 @@ int cluster_root()
     H3->SetFillColor(1);
     H3->SetStats(0);
     H3->Draw("box");
+
+    char buf[100];
+    sprintf(&buf[0], "./cluster_root_compare.png");
+    c1->SaveAs(buf);
 
     return 0;
 }
