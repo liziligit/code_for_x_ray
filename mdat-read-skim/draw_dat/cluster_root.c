@@ -73,8 +73,7 @@ int cluster_root()
 
     const int min2d = 0;
     const int max2d = 1;
-    const int mini_cluster_size_boundary = 1;//边界像素个数满足一定数量才处理
-    const int mini_cluster_size_area = 2;//中间像素个数满足一定数量才处理
+    const int mini_cluster_size_area = 2;//像素个数小于等于2个，就删除
     binArray a;
     a.nRow = 15;
     a.nCol = 15;
@@ -207,8 +206,6 @@ int cluster_root()
     cout << "cluster No is: " << vc.size() << endl;
     for (int i = 0; i < vc.size(); i++) //vc中的vector元素的个数
     {
-        if ( vc[i].size() / 2 >= mini_cluster_size_boundary ) //边界有至少一个像素，则删除
-        {
             cout << endl;
             cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
             for (int j = 0; j < vc[i].size(); j++) //vc中第i个vector元素的长度
@@ -236,38 +233,9 @@ int cluster_root()
                     // break;//不显示后续的坐标
                 }
             }
-        }
-
-        // if(vc[i].size() / 2 <= mini_cluster_size_area) //像素个数少于mini_cluster_size_area，则删除
-        // {
-        //     for (int j = 0; j < vc[i].size(); j++){
-        //         if (j % 2 == 0){
-        //             cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")"<< "x ";
-        //             ivec2[vc[i][j]][vc[i][j + 1]] = 0;
-        //         }
-        //     }
-        // }
     }
     cout << endl;
 //*******************ddel boundary and mini isolate cluster*******************************
-
-    cout << "cluster No is: " << vc.size() << endl;
-    for (int i = 0; i < vc.size(); i++) //vc中的vector元素的个数
-    {
-        if (vc[i].size() / 2 >= mini_cluster_size_boundary) //像素个数满足一定数量才处理
-        {
-            cout << endl;
-            cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
-            for (int j = 0; j < vc[i].size(); j++) //vc中第i个vector元素的长度
-            {
-                if (j % 2 == 0)
-                {
-                    cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
-                }
-            }
-        }
-    }
-    cout << endl;
 
     for (int i = 0; i < a.nRow; i++)
     {
