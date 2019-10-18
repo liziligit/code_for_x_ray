@@ -1,28 +1,28 @@
 {
     "code-runner.runInTerminal": true,
     // "C_Cpp.default.cppStandard": "c++11",
-    "editor.formatOnType": true,//按下分号自动帮你格式化
-    "code-runner.executorMap":{
+    "editor.formatOnType": true, //按下分号自动帮你格式化
+    "code-runner.executorMap": {
         //g++ for *.cpp, gcc for *.c, $fullFileName, cd $dir,
         // "cpp":"cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
-        "python":"python3 $fileName",
-        "c":"root -l $fileName",
-        "cpp":"g++ $fileName -o $fileNameWithoutExt && $fileNameWithoutExt",
-        },
-        "files.associations": {
-            "ostream": "c",
-            "vector": "c",
-            "iosfwd": "c",
-            "iterator": "c",
-            "iostream": "cpp",
-            "random": "c",
-            "fstream": "c",
-            "locale": "c",
-            "*.tcc": "c",
-            "string": "c",
-            "loader_file.h": "c",
-            "string.h": "c",
-            "__split_buffer": "cpp",
-            "deque": "cpp"
-        }
+        "python": "python3 $fileName",
+        "c": "root -l $fileName",
+        "cpp": "g++ $fileName -o $fileNameWithoutExt && $fileNameWithoutExt",
+    },
+    "files.associations": {
+        "ostream": "c",
+        "vector": "c",
+        "iosfwd": "c",
+        "iterator": "c",
+        "iostream": "cpp",
+        "random": "c",
+        "fstream": "c",
+        "locale": "c",
+        "*.tcc": "c",
+        "string": "c",
+        "loader_file.h": "c",
+        "string.h": "c",
+        "__split_buffer": "cpp",
+        "deque": "cpp"
+    }
 }

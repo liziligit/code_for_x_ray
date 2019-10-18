@@ -1,5 +1,10 @@
+//find cluster in matrix for tometal-ii-
+//image binaryzation
+//author Lizili 20191017
+
 #include <iostream>
 #include <vector>
+// #include "TGraph.h"
 using namespace std;
 
 class binArray
@@ -56,12 +61,22 @@ int cluster(int x, int y, vector<int> &vx, binArray &a)
     return 0;
 };
 
-int main(int argc, char **argv)
-{
 
+int cluster_root()
+{
+    TCanvas *c1 = new TCanvas("c1", "c1", 0, 0, 1200, 600);
+    c1->Divide(2,1);
+    TH2F *H2;
+    H2 = new TH2F("H2", "Projection", 15, 0, 15, 15, 0, 15);
+    TH2F *H3;
+    H3 = new TH2F("H3", "Projection", 15, 0, 15, 15, 0, 15);
+
+    const int min2d = 0;
+    const int max2d = 1;
+    const int mini_cluster_size = 4;
     binArray a;
-    a.nRow = 11;
-    a.nCol = 11;
+    a.nRow = 15;
+    a.nCol = 15;
     a.d = new int[a.nRow * a.nCol];
     for (int i = 0; i < a.nRow; i++)
     {
@@ -82,6 +97,17 @@ int main(int argc, char **argv)
     a.getP(6, 2)[0] = 1;
     a.getP(7, 1)[0] = 1;
     a.getP(7, 2)[0] = 1;
+
+    a.getP(3, 7)[0] = 1;
+    a.getP(4, 8)[0] = 1;
+    a.getP(4, 9)[0] = 1;
+    a.getP(3, 9)[0] = 1;
+    a.getP(3, 10)[0] = 1;
+
+    a.getP(10, 10)[0] = 1;
+    a.getP(11, 11)[0] = 1;
+    a.getP(12, 12)[0] = 1;
+    a.getP(13, 13)[0] = 1;
 ///////////////////////////////////////////
     a.getP(7, 8)[0] = 1;
     a.getP(7, 9)[0] = 1;
@@ -113,9 +139,36 @@ int main(int argc, char **argv)
     a.getP(1, 9)[0] = 1;
     a.getP(1, 10)[0] = 1;
 
+    a.getP(12, 4)[0] = 1;
+    a.getP(12, 3)[0] = 1;
+    a.getP(13, 2)[0] = 1;
+    a.getP(14, 1)[0] = 1;
+
+    a.getP(3, 14)[0] = 1;
+    a.getP(4, 14)[0] = 1;
+    a.getP(5, 14)[0] = 1;
+    a.getP(6, 14)[0] = 1;
+    a.getP(7, 14)[0] = 1;
+    a.getP(8, 14)[0] = 1;
+    a.getP(9, 14)[0] = 1;
+
     vector<int> vx;
     vector<vector<int> > vc; //多维向量
     vc.clear();
+
+    vector<vector <int> > ivec;
+    ivec.resize(a.nRow,vector<int>(a.nCol, 0));
+
+    vector<vector <int> > ivec2;
+    ivec2.resize(a.nRow,vector<int>(a.nCol, 0));
+
+    for(int i = 0; i < a.nRow; i++){
+        for(int j = 0; j < a.nCol; j++){
+            ivec[i][j] = a.getP(i, j)[0];
+            ivec2[i][j] = a.getP(i, j)[0];
+            H2->Fill(i, j, ivec[i][j]);
+        }
+    }
 
     for (int i = 0; i < a.nRow; i++)
     {
@@ -129,24 +182,37 @@ int main(int argc, char **argv)
         }
     }
 
+    c1->cd(1);
+    H2->GetZaxis()->SetRangeUser(min2d, max2d);
+    H2->SetFillColor(1);
+    H2->SetStats(0);
+    H2->Draw("box");
+
     cout << "cluster No is: " << vc.size() << endl;
     for (int i = 0; i < vc.size(); i++) //vc中的vector元素的个数
     {
-        if (vc[i].size() / 2 >= 4) //像素个数满足一定数量
+        if (vc[i].size() / 2 >= mini_cluster_size) //像素个数满足一定数量
         {
             cout << endl;
             cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
             for (int j = 0; j < vc[i].size(); j++) //vc中第i个vector元素的长度
             {    
+                
                 if (j % 2 == 0)
                 {
+                    // cout << vc[i].size();
                     cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
                 }
                 if(vc[i][j]==0 || vc[i][j]==a.nCol-1)//ok
                     {
                         cout << "xxxxxxxx ";
-                        vc[i].clear();//虽然删除，还是存在
-                        break;
+                        for (int j = 0; j < vc[i].size(); j++){
+                            if (j % 2 == 0){
+                                ivec2[vc[i][j]][vc[i][j + 1]] = 0;
+                                // cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
+                            }
+                        }
+                        break;//不显示后续的坐标
                     }
             }
         }
@@ -156,7 +222,7 @@ int main(int argc, char **argv)
     cout << "cluster No is: " << vc.size() << endl;
     for (int i = 0; i < vc.size(); i++) //vc中的vector元素的个数
     {
-        if (vc[i].size() / 2 >= 4) //像素个数满足一定数量
+        if (vc[i].size() / 2 >= mini_cluster_size) //像素个数满足一定数量
         {
             cout << endl;
             cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
@@ -170,4 +236,22 @@ int main(int argc, char **argv)
         }
     }
     cout << endl;
+
+    for (int i = 0; i < a.nRow; i++)
+    {
+        for (int j = 0; j < a.nCol; j++)
+        {
+            // H3->Fill(i, j, a.getP(i, j)[0]);
+            H3->Fill(i, j, ivec2[i][j]);
+            // cout << ivec2[i][j] <<endl;
+        }
+    }
+
+    c1->cd(2);
+    H3->GetZaxis()->SetRangeUser(min2d, max2d);
+    H3->SetFillColor(1);
+    H3->SetStats(0);
+    H3->Draw("box");
+
+    return 0;
 }

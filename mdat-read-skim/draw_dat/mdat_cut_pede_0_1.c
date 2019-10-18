@@ -61,7 +61,7 @@ void mdat_cut_pede_0_1()
     }
     //////////////////////////////////////////////////for 3D array
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i < 75; i++)
+    for (int i = 0; i < 28; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         sumsig = 0;
