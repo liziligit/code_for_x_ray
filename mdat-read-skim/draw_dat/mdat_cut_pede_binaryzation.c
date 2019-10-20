@@ -1,38 +1,19 @@
-// #include "TROOT.h"
-// #include "TFile.h"
-// #include "TTree.h"
-// #include <unistd.h>
-#include <stdio.h>
-// #include "iostream"
-// #include "Riostream.h"
-#include "TGraph.h"
-// #include "TSpectrum.h"
-// #include "TApplication.h"
-// #include <iostream>//for file size
-// #include <fstream>//for file size
-#include <string.h> // for strrchr()
-#include <vector>
-#include <cstdlib> // exit()
+//仅仅对mdat作二值化显示处理
 #include "loader_file.h"
 
-// using namespace RooFit;
-using namespace std;
-
 TCanvas *c1 = new TCanvas("c1", "Canvas", 0, 0, 600, 600);
-void mdat_cut_pede()
+void mdat_cut_pede_binaryzation()
 {
     TH2F *H2;
-    const int min2d = -10;
-    const int max2d = 10;
+    const int min2d = 0;
+    const int max2d = 1;
     const int NX = 72;
     const int NY = 72;
     char str[30];
     int sumsig;
-    // int ldata;//read for .dat
-    //  unsigned short ldata;//read for .mdat
+    
     char inPdedFile[] = "../data/pede.txt";
     char inDataFile[] = "../data/out5.mdat";
-    char output_txt[] = "./output_txt.dat"; //for debug
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
 
@@ -40,14 +21,15 @@ void mdat_cut_pede()
     int iChipT = 0, iPixelT = 0, iCounter = 0;
     float pedestalT = 0., noiseT = 0.;
     float meanPed[5184];
+    float rmsPed[5184];
+
     while (!infilePede.eof() && iCounter < 5184)
     {
         infilePede >> iChipT >> iPixelT >> pedestalT >> noiseT;
         meanPed[iCounter] = pedestalT;
-        // meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat-------->3/3
-        // rmsPed[iChipT*nPixelsOnChip+iPixelT] = noiseT;
+        // meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat
+        rmsPed[iCounter] = noiseT;
         iCounter++;
-        // cout << pedestalT << endl;
     }
 
     //////////////////////////////////////////////////How many Frame counts
@@ -73,9 +55,6 @@ void mdat_cut_pede()
             array3D[i][j].resize(LONGTH); //3
     }
     //////////////////////////////////////////////////for 3D array
-    ofstream output;
-    output.open(output_txt);//清空模式
-
     // for (int i = 0; i < iFrames; i++)
     for (int i = 0; i < 76; i++)
     {
@@ -87,7 +66,16 @@ void mdat_cut_pede()
         {
             for (int jj = 0; jj < NY; jj++)
             {
-                array3D[i][ii][jj] = _data_short[ii][jj] - meanPed[ii * 72 + jj];
+                array3D[i][ii][jj] = _data_short[ii][jj] - (meanPed[ii * 72 + jj] + 5 * rmsPed[ii * 72 + jj]);
+                
+                if (array3D[i][ii][jj] > 0)
+                {
+                    array3D[i][ii][jj] = 1;
+                }
+                else if (array3D[i][ii][jj] <= 0)
+                {
+                    array3D[i][ii][jj] = 0;
+                }
                 sumsig = sumsig + array3D[i][ii][jj];
                 H2->Fill(ii, jj, array3D[i][ii][jj]);
             }
@@ -97,26 +85,17 @@ void mdat_cut_pede()
         sprintf(str, "frame %d", i);
         H2->SetTitle(str);
         H2->GetZaxis()->SetRangeUser(min2d, max2d);
-        H2->Draw("Colz");
+        H2->SetFillColor(1);
+        H2->Draw("box");
         H2->SetStats(0);
         c1->Modified();
         c1->Update();
 
-        if(i == 75){
+        if (i == 75)
+        {
             char buf[100];
-            sprintf(&buf[0],"./mdat_frame%d.png",i);
+            sprintf(&buf[0], "./mdat_frame%d_0_1.png", i);
             c1->SaveAs(buf);
-        }
-
-        if(i == 75){
-            for (int ii = 0; ii < NX; ii++)
-            {
-                for (int jj = 0; jj < NY; jj++)
-                {
-                    output << fixed << setprecision(0) <<setiosflags(ios::left)<< setw(3) << array3D[i][ii][jj] << ",";
-                }
-                output << "xxxxxx "<< endl;
-            }
         }
 
         if (gSystem->ProcessEvents()) //不能去除，否则没有动画
@@ -125,5 +104,4 @@ void mdat_cut_pede()
 
     infileSig.close();
     infilePede.close();
-    output.close();
 }
