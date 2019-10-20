@@ -67,8 +67,8 @@ int mdat_cut_pede_binaryzation_cluster()
     c1->Divide(2,1);
     TH2F *H2;
     TH2F *H3;
-    const int min2d = 0;
-    const int max2d = 1;
+    const int min2d = -10;
+    const int max2d = 10;
     const int NX = 72;
     const int NY = 72;
     char str2[30];
@@ -95,7 +95,7 @@ int mdat_cut_pede_binaryzation_cluster()
 
     vector<vector <int> > ivec;
     ivec.resize(a.nRow,vector<int>(a.nCol, 0));//初始化0
-    ivec.clear();
+    // ivec.clear();
     
     char inPdedFile[] = "../data/pede.txt";
     char inDataFile[] = "../data/out5.mdat";
@@ -138,7 +138,7 @@ int mdat_cut_pede_binaryzation_cluster()
     // output.open(output_txt);//覆盖模式
 
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i < 76; i++)
+    for (int i = 0; i < 128; i++)
     {
 
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
@@ -151,24 +151,28 @@ int mdat_cut_pede_binaryzation_cluster()
             for (int jj = 0; jj < NY; jj++)
             {
                 array3D[i][ii][jj]= _data_short[ii][jj] - (meanPed[ii * 72 + jj] + 5 * rmsPed[ii * 72 + jj]);
-                array3D[i][ii][jj] = (array3D[i][ii][jj] > 0) ? 1 : 0;
                 a.getP(ii, jj)[0] = array3D[i][ii][jj];
 
-                ivec[ii][jj] = array3D[i][ii][jj];
+                a.getP(ii, jj)[0] = (a.getP(ii, jj)[0] > 0) ? 1 : 0;
+
+                ivec[ii][jj] = a.getP(ii, jj)[0];
+
+                array3D[i][ii][jj] = array3D[i][ii][jj] + 5 * rmsPed[ii * 72 + jj];
 
                 H2->Fill(ii, jj, array3D[i][ii][jj]);
+                
                 // sumsig = sumsig + a.getP(ii, jj)[0];
             }
         }
 
-        for (int i = 0; i < a.nRow; i++)
+        for (int ii = 0; ii < a.nRow; ii++)
         {
-            for (int j = 0; j < a.nCol; j++)
+            for (int jj = 0; jj < a.nCol; jj++)
             {
-                if (a.get(i, j) == 0)
+                if (a.get(ii, jj) == 0)
                     continue;
                 vx.clear();
-                cluster(i, j, vx, a);
+                cluster(ii, jj, vx, a);
                 vc.push_back(vx);
             }
         }
@@ -177,30 +181,30 @@ int mdat_cut_pede_binaryzation_cluster()
 
 //*******************del boundary and mini isolate cluster*******************************
     // cout << "cluster No is: " << vc.size() << endl;
-    for (int i = 0; i < vc.size(); i++) //vc中的vector元素的个数
+    for (int ii = 0; ii < vc.size(); ii++) //vc中的vector元素的个数
     {
             // cout << endl;
             // cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
-            for (int j = 0; j < vc[i].size(); j++) //vc中第i个vector元素的长度
+            for (int jj = 0; jj < vc[ii].size(); jj++) //vc中第i个vector元素的长度
             {    
                 
-                if (j % 2 == 0)
+                if (jj % 2 == 0)
                 {
                     // cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
-                    if(vc[i].size() / 2 <= mini_cluster_size_area){//像素个数少于mini_cluster_size_area，则删除
-                        ivec[vc[i][j]][vc[i][j + 1]] = 0;
+                    if(vc[ii].size() / 2 <= mini_cluster_size_area){//像素个数少于mini_cluster_size_area，则删除
+                        ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
                         // cout<< "x ";
                     }
                     
                 }
-                if(vc[i][j]==0 || vc[i][j]==a.nCol-1)//边界的删除
+                if(vc[ii][jj]==0 || vc[ii][jj]==a.nCol-1)//边界的删除
                 {
                     // cout << "xxx ";
-                    for (int j = 0; j < vc[i].size(); j++)
+                    for (int jj = 0; jj < vc[ii].size(); jj++)
                     {
-                        if (j % 2 == 0)
+                        if (jj % 2 == 0)
                         {
-                            ivec[vc[i][j]][vc[i][j + 1]] = 0;
+                            ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
                         }
                     }
                     // break;//不显示后续的坐标
@@ -208,15 +212,19 @@ int mdat_cut_pede_binaryzation_cluster()
             }
     }
     // cout << endl;
-    vc.clear();
+    
     // cout<<vc.size()<<":"<<vc.capacity()<<endl;
 //*******************ddel boundary and mini isolate cluster*******************************
 
-    for (int i = 0; i < a.nRow; i++)
+    for (int ii = 0; ii < a.nRow; ii++)
     {
-        for (int j = 0; j < a.nCol; j++)
+        for (int jj = 0; jj < a.nCol; jj++)
         {
-            H3->Fill(i, j, ivec[i][j]);
+            if(ivec[ii][jj] == 1)
+            {
+                ivec[ii][jj] = array3D[i][ii][jj];
+            }
+            H3->Fill(ii, jj, ivec[ii][jj]);
         }
     }
 
@@ -224,17 +232,16 @@ int mdat_cut_pede_binaryzation_cluster()
     sprintf(str2, "frame %d", i);
     H2->SetTitle(str2);
     H2->GetZaxis()->SetRangeUser(min2d, max2d);
-    H2->SetFillColor(1);
+    // H2->SetFillColor(1);
     H2->SetStats(0);
-    H2->Draw("box");
+    H2->Draw("Colz");
     
     c1->cd(2);
     sprintf(str3, "frame %d", i);
     H3->SetTitle(str3);
     H3->GetZaxis()->SetRangeUser(min2d, max2d);
-    H3->SetFillColor(1);
     H3->SetStats(0);
-    H3->Draw("box");
+    H3->Draw("Colz");
     c1->Update();  
 
         // if (i == 75)
@@ -246,6 +253,7 @@ int mdat_cut_pede_binaryzation_cluster()
 
     // sleep(1);//second
     // usleep(500000); // will sleep for 1s
+    vc.clear();
 
         if (gSystem->ProcessEvents()) //不能去除，否则没有动画
             break;
