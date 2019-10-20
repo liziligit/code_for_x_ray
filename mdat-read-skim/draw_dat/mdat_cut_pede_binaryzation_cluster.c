@@ -89,14 +89,13 @@ int mdat_cut_pede_binaryzation_cluster()
     }
 
     vector<int> vx;
-    vector<vector<int> > vc; //多维向量
+    vx.clear();
+    vector<vector<int> > vc; //二维向量
     vc.clear();
 
     vector<vector <int> > ivec;
-    ivec.resize(a.nRow,vector<int>(a.nCol, 0));
-
-    vector<vector <int> > ivec2;
-    ivec2.resize(a.nRow,vector<int>(a.nCol, 0));
+    ivec.resize(a.nRow,vector<int>(a.nCol, 0));//初始化0
+    ivec.clear();
     
     char inPdedFile[] = "../data/pede.txt";
     char inDataFile[] = "../data/out5.mdat";
@@ -127,18 +126,19 @@ int mdat_cut_pede_binaryzation_cluster()
     cout << "iFrame num is: " << iFrames << endl; //808
     //////////////////////////////////////////////////How many Frame counts
 
-    //////////////////////////////////////////////////for 3D array
+    //*******************for 3D array*******************************
     int DEPTH = iFrames;
     int HEIGHT = NY;
     int LONGTH = NX;
     // 初始化
     vector<vector<vector<float> > > array3D (DEPTH, vector<vector<float> >(HEIGHT, vector<float>(LONGTH, 0)));
-    ////////////////////////////////////////////////for 3D array
+    //*******************for 3D array*******************************
+    
     // ofstream output;
     // output.open(output_txt);//覆盖模式
 
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i < 113; i++)
+    for (int i = 0; i < 76; i++)
     {
 
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
@@ -155,7 +155,6 @@ int mdat_cut_pede_binaryzation_cluster()
                 a.getP(ii, jj)[0] = array3D[i][ii][jj];
 
                 ivec[ii][jj] = array3D[i][ii][jj];
-                ivec2[ii][jj] = array3D[i][ii][jj];
 
                 H2->Fill(ii, jj, array3D[i][ii][jj]);
                 // sumsig = sumsig + a.getP(ii, jj)[0];
@@ -174,13 +173,7 @@ int mdat_cut_pede_binaryzation_cluster()
             }
         }
 
-        c1->cd(1);
-        sprintf(str2, "frame %d", i);
-        H2->SetTitle(str2);
-        H2->GetZaxis()->SetRangeUser(min2d, max2d);
-        H2->SetFillColor(1);
-        H2->SetStats(0);
-        H2->Draw("box");
+        
 
 //*******************del boundary and mini isolate cluster*******************************
     // cout << "cluster No is: " << vc.size() << endl;
@@ -195,7 +188,7 @@ int mdat_cut_pede_binaryzation_cluster()
                 {
                     // cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
                     if(vc[i].size() / 2 <= mini_cluster_size_area){//像素个数少于mini_cluster_size_area，则删除
-                        ivec2[vc[i][j]][vc[i][j + 1]] = 0;
+                        ivec[vc[i][j]][vc[i][j + 1]] = 0;
                         // cout<< "x ";
                     }
                     
@@ -207,7 +200,7 @@ int mdat_cut_pede_binaryzation_cluster()
                     {
                         if (j % 2 == 0)
                         {
-                            ivec2[vc[i][j]][vc[i][j + 1]] = 0;
+                            ivec[vc[i][j]][vc[i][j + 1]] = 0;
                         }
                     }
                     // break;//不显示后续的坐标
@@ -216,15 +209,24 @@ int mdat_cut_pede_binaryzation_cluster()
     }
     // cout << endl;
     vc.clear();
+    // cout<<vc.size()<<":"<<vc.capacity()<<endl;
 //*******************ddel boundary and mini isolate cluster*******************************
 
     for (int i = 0; i < a.nRow; i++)
     {
         for (int j = 0; j < a.nCol; j++)
         {
-            H3->Fill(i, j, ivec2[i][j]);
+            H3->Fill(i, j, ivec[i][j]);
         }
     }
+
+    c1->cd(1);
+    sprintf(str2, "frame %d", i);
+    H2->SetTitle(str2);
+    H2->GetZaxis()->SetRangeUser(min2d, max2d);
+    H2->SetFillColor(1);
+    H2->SetStats(0);
+    H2->Draw("box");
     
     c1->cd(2);
     sprintf(str3, "frame %d", i);
@@ -241,20 +243,7 @@ int mdat_cut_pede_binaryzation_cluster()
         //     sprintf(&buf[0], "./mdat_frame%d_0_1.png", i);
         //     c1->SaveAs(buf);
         // }
-/*
-        if(i == 75){
-            for (int ii = 0; ii < NX; ii++)
-            {
-                for (int jj = 0; jj < NY; jj++)
-                {
-                    // output << fixed << setprecision(1) <<setiosflags(ios::left)<< setw(3) << array3D[75][ii][jj] << ",";
-                    // output << fixed << setprecision(1) <<setiosflags(ios::left)<< setw(3) << ivec[ii][jj] << ",";
-                    // output << fixed << setprecision(1) <<setiosflags(ios::left)<< setw(3) << ivec2[ii][jj] << ",";
-                }
-                // output << "xxxxxx "<< endl;
-            }
-        }
-*/
+
     // sleep(1);//second
     // usleep(500000); // will sleep for 1s
 
