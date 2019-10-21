@@ -97,6 +97,7 @@ int mdat_cut_pede_binaryzation_cluster()
     ivec.resize(a.nRow,vector<int>(a.nCol, 0));//初始化0
     
     char inPdedFile[] = "../data/pede.txt";
+    // char inDataFile[] = "../data/out5.mdat";
     char inDataFile[] = "../data/out7.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
     ifstream infilePede(inPdedFile);
@@ -129,8 +130,7 @@ int mdat_cut_pede_binaryzation_cluster()
     int DEPTH = iFrames;
     int HEIGHT = NY;
     int LONGTH = NX;
-    // 初始化
-    vector<vector<vector<float> > > array3D (DEPTH, vector<vector<float> >(HEIGHT, vector<float>(LONGTH, 0)));
+    vector<vector<vector<float> > > array3D (DEPTH, vector<vector<float> >(HEIGHT, vector<float>(LONGTH, 0)));// 初始化
     //*******************for 3D array*******************************
     
     // ofstream output;
@@ -139,7 +139,6 @@ int mdat_cut_pede_binaryzation_cluster()
     // for (int i = 0; i < iFrames; i++)
     for (int i = 0; i < 58; i++)
     {
-
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         // sumsig = 0;
@@ -176,10 +175,9 @@ int mdat_cut_pede_binaryzation_cluster()
             }
         }
 
-        
-
 //*******************del boundary and mini isolate cluster*******************************
     // cout << "cluster No is: " << vc.size() << endl;
+    int maxCluster = vc[0].size();
     for (int ii = 0; ii < vc.size(); ii++) //vc中的vector元素的个数
     {
             // cout << endl;
@@ -194,6 +192,21 @@ int mdat_cut_pede_binaryzation_cluster()
                     }
                 }
                 if(vc[ii][jj]==0 || vc[ii][jj]==a.nCol-1)//边界的删除
+                {
+                    if (jj % 2 == 0)
+                    {
+                        ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
+                    }
+                }
+                
+            }
+            if(vc[ii].size() / 2 > maxCluster)//一帧中只保留最大束团
+            {
+                maxCluster = vc[ii].size() / 2;
+            }
+            else
+            {
+                for (int jj = 0; jj < vc[ii].size(); jj++)
                 {
                     if (jj % 2 == 0)
                     {
