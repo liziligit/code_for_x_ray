@@ -95,10 +95,9 @@ int mdat_cut_pede_binaryzation_cluster()
 
     vector<vector <int> > ivec;
     ivec.resize(a.nRow,vector<int>(a.nCol, 0));//初始化0
-    // ivec.clear();
     
     char inPdedFile[] = "../data/pede.txt";
-    char inDataFile[] = "../data/out5.mdat";
+    char inDataFile[] = "../data/out7.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
@@ -138,7 +137,7 @@ int mdat_cut_pede_binaryzation_cluster()
     // output.open(output_txt);//覆盖模式
 
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i < 128; i++)
+    for (int i = 0; i < 58; i++)
     {
 
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);

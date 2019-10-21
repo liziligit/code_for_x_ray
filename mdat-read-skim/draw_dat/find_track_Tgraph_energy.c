@@ -45,12 +45,12 @@ void find_track_Tgraph_energy(int iStart_num, int iAccout)
     // l = new TList();
 
     int NX = 72, NY = 72;
-    // char pedefn[] = "../data/pede.txt";
-    // char beamfn[] = "../data/";
+    char pedefn[] = "../data/pede.txt";
+    char beamfn[] = "../data/";
     // char Output[] = "./output.txt"; //for debug
     char Energydat[] = "./Energy.dat"; //for debug
-    char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
-    char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
+    // char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
     /////get beamId in to list
     vector<string> name_id;
 
@@ -146,8 +146,8 @@ void find_track_Tgraph_energy(int iStart_num, int iAccout)
     energy.open(Energydat,ios::app);//追加模式
     for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     {
-        // sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
-        sprintf(inDataFile,"/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out%d.mdat", idList[fileId]);
+        sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
+        // sprintf(inDataFile,"/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out%d.mdat", idList[fileId]);
 
         cout << inDataFile << endl;
 

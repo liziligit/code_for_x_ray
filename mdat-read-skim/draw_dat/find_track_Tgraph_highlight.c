@@ -40,10 +40,10 @@ void find_track_Tgraph_highlight()
     l = new TList();
 
     int NX = 72, NY = 72;
-    // char pedefn[] = "../data/pede.txt";
-    char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
-    // char beamfn[] = "../data/";
-    char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
+    char pedefn[] = "../data/pede.txt";
+    // char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    char beamfn[] = "../data/";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
     char Output[] = "./output.txt"; //for debug
     // char pedefn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";
     // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
@@ -89,8 +89,8 @@ void find_track_Tgraph_highlight()
          << " -> "
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
-    int iStart_num = 10;
-    int iAccout = 5;
+    int iStart_num = 5;
+    int iAccout = 1;
     int fileAcount = 0;
 
     //*******************for 3D array*******************************
@@ -143,8 +143,8 @@ void find_track_Tgraph_highlight()
     of.open(Output);
     for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     {
-        // sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
-        sprintf(inDataFile,"/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out%d.mdat", idList[fileId]);
+        sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
+        // sprintf(inDataFile,"/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out%d.mdat", idList[fileId]);
 
         cout << inDataFile << endl;
 
