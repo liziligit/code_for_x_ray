@@ -117,5 +117,9 @@ for (int i = 0; i < vc.size(); i++)
         cout<<endl;
     }
 
+cout << "vc.size: " << vc.size() << endl;
+cout << "vc[0].size: " << vc[0].size() << endl;
+cout << "vc[1].size: " << vc[1].size() << endl;
+
 return 0;
 }

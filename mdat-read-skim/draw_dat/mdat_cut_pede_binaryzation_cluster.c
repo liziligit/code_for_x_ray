@@ -186,27 +186,19 @@ int mdat_cut_pede_binaryzation_cluster()
             // cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
             for (int jj = 0; jj < vc[ii].size(); jj++) //vc中第i个vector元素的长度
             {    
-                
-                if (jj % 2 == 0)
+                if(vc[ii].size() / 2 <= mini_cluster_size_area)//像素个数少于mini_cluster_size_area，则删除
                 {
-                    // cout << "(" << vc[i][j] << "," << vc[i][j + 1] << ")";
-                    if(vc[ii].size() / 2 <= mini_cluster_size_area){//像素个数少于mini_cluster_size_area，则删除
+                    if(jj % 2 == 0)
+                    {
                         ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
-                        // cout<< "x ";
                     }
-                    
                 }
                 if(vc[ii][jj]==0 || vc[ii][jj]==a.nCol-1)//边界的删除
                 {
-                    // cout << "xxx ";
-                    for (int jj = 0; jj < vc[ii].size(); jj++)
+                    if (jj % 2 == 0)
                     {
-                        if (jj % 2 == 0)
-                        {
-                            ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
-                        }
+                        ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
                     }
-                    // break;//不显示后续的坐标
                 }
             }
     }
