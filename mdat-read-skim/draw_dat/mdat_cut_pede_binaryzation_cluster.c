@@ -128,7 +128,7 @@ int mdat_cut_pede_binaryzation_cluster()
     //////////////////////////////////////////////////How many Frame counts
     unsigned short _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1
     int fz = file_loder::file_size(inDataFile);
-    cout << "the size of file is: " << fz << endl;
+    // cout << "the size of file is: " << fz << endl;
     int iFrames = 0;
     iFrames = fz / sizeof(_data0_short);
     cout << "iFrame num is: " << iFrames << endl; //808
@@ -145,7 +145,7 @@ int mdat_cut_pede_binaryzation_cluster()
     // output.open(output_txt);//覆盖模式
 
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i <= 50; i++)
+    for (int i = 0; i <= 57; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
@@ -304,13 +304,13 @@ int mdat_cut_pede_binaryzation_cluster()
     sum_ivec.clear();
     vc.clear();
 
-    // if(i > 280)
+    // if(i >= 57)
     // {
     //     sleep(1);//second
     // }
 
-        if (gSystem->ProcessEvents()) //不能去除，否则没有动画
-            break;
+    if (gSystem->ProcessEvents()) //不能去除，否则没有动画
+        break;
     }
 
     infileSig.close();
