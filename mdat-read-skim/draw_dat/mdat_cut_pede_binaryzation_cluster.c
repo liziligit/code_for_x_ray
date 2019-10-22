@@ -2,8 +2,16 @@
 //image binaryzation and extract cluster
 //author Lizili 20191020
 
-#include <vector>
-#include <unistd.h>//sleep(s)
+//problem
+//5-176右边界去除
+//5-75,127中间斑点正常
+//7-137右边界去除
+//7-277下边界去除
+//7-57中间第二大斑点删除v
+//7-50中间斑点显示
+
+// #include <vector>
+// #include <unistd.h>//sleep(s)
 #include "loader_file.h"
 using namespace std;
 
@@ -95,7 +103,7 @@ int mdat_cut_pede_binaryzation_cluster()
 
     vector<vector <int> > ivec;
     ivec.resize(a.nRow,vector<int>(a.nCol, 0));//初始化0
-    
+
     char inPdedFile[] = "../data/pede.txt";
     // char inDataFile[] = "../data/out5.mdat";
     char inDataFile[] = "../data/out7.mdat";
@@ -137,7 +145,7 @@ int mdat_cut_pede_binaryzation_cluster()
     // output.open(output_txt);//覆盖模式
 
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i < 58; i++)
+    for (int i = 0; i <= 50; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
@@ -176,49 +184,85 @@ int mdat_cut_pede_binaryzation_cluster()
         }
 
 //*******************del boundary and mini isolate cluster*******************************
-    // cout << "cluster No is: " << vc.size() << endl;
-    int maxCluster = vc[0].size();
+    vector<int> sum_ivec(vc.size(), 0);
+    int index_max = 0;//index_max用于接收最大值下标
     for (int ii = 0; ii < vc.size(); ii++) //vc中的vector元素的个数
     {
-            // cout << endl;
-            // cout << "Pixels of " << i << "th valid cluster: " << vc[i].size() / 2 << endl;
-            for (int jj = 0; jj < vc[ii].size(); jj++) //vc中第i个vector元素的长度
-            {    
-                if(vc[ii].size() / 2 <= mini_cluster_size_area)//像素个数少于mini_cluster_size_area，则删除
+//*******************只保留特定像素数量的束团*******************************
+            if(vc[ii].size() / 2 <= mini_cluster_size_area)//像素个数少于mini_cluster_size_area，则删除
+            {
+                for (int jj = 0; jj < vc[ii].size(); jj++) //vc中第i个vector元素的长度
                 {
                     if(jj % 2 == 0)
                     {
                         ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
                     }
                 }
-                if(vc[ii][jj]==0 || vc[ii][jj]==a.nCol-1)//边界的删除
-                {
-                    if (jj % 2 == 0)
-                    {
-                        ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
-                    }
-                }
-                
             }
-            if(vc[ii].size() / 2 > maxCluster)//一帧中只保留最大束团
+//*******************只保留特定像素数量的束团*******************************
+//*******************去除边界束团*****************************************
+            for (int jj = 0; jj < vc[ii].size(); jj++)
             {
-                maxCluster = vc[ii].size() / 2;
-            }
-            else
-            {
-                for (int jj = 0; jj < vc[ii].size(); jj++)
+                if(vc[ii][jj] == 0 || vc[ii][jj] == a.nCol-1)//边界的删除
                 {
-                    if (jj % 2 == 0)
+                    for(int jj = 0; jj < vc[ii].size(); jj++)
                     {
-                        ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
+                        if (jj % 2 == 0)
+                        {
+                            ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
+                        }
                     }
+                    break;//终止外层循环
                 }
             }
+//*******************去除边界束团*****************************************
+
+//*******************找到最大束团的下标位置*******************************
+        sum_ivec[0] = 0;
+        for(int jj = 0; jj < vc[ii].size(); jj++)
+        {
+            if(jj % 2 == 0)
+                {
+                    sum_ivec[ii] = sum_ivec[ii] + ivec[vc[ii][jj]][vc[ii][jj + 1]];
+                }
+        }
+
+        for(int i_sum_ivec = 0; i_sum_ivec < sum_ivec.size(); ++i_sum_ivec)//找最大束才值及坐标
+        {
+            if(sum_ivec[i_sum_ivec]>sum_ivec[index_max])
+            {
+                index_max=i_sum_ivec;//用下标存储最大值下标，不仅可以找到最大值，也可以找到它的位置
+            }
+        }  
+//*******************找到最大束团的下标位置*******************************
     }
-    // cout << endl;
-    
-    // cout<<vc.size()<<":"<<vc.capacity()<<endl;
-//*******************ddel boundary and mini isolate cluster*******************************
+        // cout << "max=" << sum_ivec[index_max] << ",index_max=" << index_max << endl;//元素为0个时，不能输出
+//*******************剩余束团中，只保留最大的*******************************
+        for(int ii = 0; ii < vc.size(); ii++)
+        {
+            for(int jj = 0; jj < vc[ii].size(); jj++)
+            {
+                if(ii == index_max)
+                {
+                    continue;
+                }
+                else
+                {
+                    if (jj % 2 == 0)
+                    {
+                        ivec[vc[ii][jj]][vc[ii][jj + 1]] = 0;
+                    }
+                }
+            }
+        }
+//*******************剩余束团中，只保留最大的*******************************
+        // cout << "frame:" << i <<"xxx" << endl;
+        // for(int i_sum_ivec = 0; i_sum_ivec < sum_ivec.size(); i_sum_ivec++)//显示束团像素个数
+        // {
+        // cout << sum_ivec[i_sum_ivec] << endl;
+        // }
+
+//*******************del boundary and mini isolate cluster*******************************
 
     for (int ii = 0; ii < a.nRow; ii++)
     {
@@ -256,8 +300,14 @@ int mdat_cut_pede_binaryzation_cluster()
         // }
 
     // sleep(1);//second
-    // usleep(500000); // will sleep for 1s
+    // usleep(1000000); // will sleep for 1s
+    sum_ivec.clear();
     vc.clear();
+
+    // if(i > 280)
+    // {
+    //     sleep(1);//second
+    // }
 
         if (gSystem->ProcessEvents()) //不能去除，否则没有动画
             break;

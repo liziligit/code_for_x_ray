@@ -121,5 +121,21 @@ cout << "vc.size: " << vc.size() << endl;
 cout << "vc[0].size: " << vc[0].size() << endl;
 cout << "vc[1].size: " << vc[1].size() << endl;
 
+vc[0].clear();
+vc[1].clear();
+cout << "vc.size: " << vc.size() << endl;
+cout << "vc[0].size: " << vc[0].size() << endl;
+cout << "vc[1].size: " << vc[1].size() << endl;
+
+for (int i = 0; i < vc.size(); i++)
+    {
+        for (int j = 0; j < vc[i].size(); j++)
+        {
+            vc[i][j]=1;
+            cout << vc[i][j] <<",";
+        }
+        cout<<endl;
+    }
+
 return 0;
 }
