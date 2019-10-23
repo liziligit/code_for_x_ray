@@ -89,7 +89,7 @@ void find_track_Tgraph_highlight()
          << " -> "
          << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
-    int iStart_num = 5;
+    int iStart_num = 0;
     int iAccout = 1;
     int fileAcount = 0;
 
@@ -207,7 +207,7 @@ void find_track_Tgraph_highlight()
                 }
             }
             // H2->SetBinContent(iBin, sumsig);
-            H2->SetPoint(iFrameBegin,iFrameBegin,sumsig);
+            H2->SetPoint(iFrameBegin,iFrameBegin,sumsig);//SetPoint(i,x,y);
             aFrames_one_mdat.push_back(sumsig);
             l->Add(h);
             // cout<< iFrameBegin << " " << sumsig << " : " << aFrames_one_mdat[iFrameBegin] << endl;
@@ -275,7 +275,7 @@ void find_track_Tgraph_highlight()
         m->SetMarkerColor(kRed);
         m->Draw();
     }
-    c1->SaveAs(TString::Format("./55-1/55-1-%d_%d.root", idList[iStart_num], idList[iStart_num + iAccout - 1]));
+    // c1->SaveAs(TString::Format("./55-1/55-1-%d_%d.root", idList[iStart_num], idList[iStart_num + iAccout - 1]));
     // H2->Draw(); //只画最后一次
     of.close();
     //*******************draw the hist***************************************

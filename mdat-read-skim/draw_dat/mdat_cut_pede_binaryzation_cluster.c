@@ -81,7 +81,7 @@ int mdat_cut_pede_binaryzation_cluster()
     const int NY = 72;
     char str2[30];
     char str3[30];
-    // int sumsig;
+    int sumsig_ADC;
 
     binArray a;
     a.nRow = NX;
@@ -104,12 +104,20 @@ int mdat_cut_pede_binaryzation_cluster()
     vector<vector <int> > ivec;
     ivec.resize(a.nRow,vector<int>(a.nCol, 0));//初始化0
 
+    vector<int> ivec_sumsigADC;//extract totle ADC of each frame
+    ivec_sumsigADC.clear();
+    vector<int> ivec_sumsigADC_filter;//extract filter ADC of each frame
+    ivec_sumsigADC_filter.clear();
+
     char inPdedFile[] = "../data/pede.txt";
     // char inDataFile[] = "../data/out5.mdat";
     char inDataFile[] = "../data/out7.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
+    char output_mdat[] = "../data/out7_extract.mdat"; //for debug
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
+
+    ofstream output_m(output_mdat, ios::out | ios::binary);
 
     //////////////////////////////////////////////////read Pede
     int iChipT = 0, iPixelT = 0, iCounter = 0;
@@ -139,17 +147,20 @@ int mdat_cut_pede_binaryzation_cluster()
     int HEIGHT = NY;
     int LONGTH = NX;
     vector<vector<vector<float> > > array3D (DEPTH, vector<vector<float> >(HEIGHT, vector<float>(LONGTH, 0)));// 初始化
+
+    // vector<vector <int> > ivec;
+    // ivec.resize(a.nRow,vector<int>(a.nCol, 0));//初始化0
     //*******************for 3D array*******************************
     
     // ofstream output;
     // output.open(output_txt);//覆盖模式
 
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i <= 57; i++)
+    for (int i = 0; i <= 75; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
-        // sumsig = 0;
+        sumsig_ADC = 0;
         unsigned short _data_short[NX][NY];
         infileSig.read((char *)(&_data_short), sizeof(_data_short));
         for (int ii = 0; ii < NX; ii++)
@@ -166,8 +177,6 @@ int mdat_cut_pede_binaryzation_cluster()
                 array3D[i][ii][jj] = array3D[i][ii][jj] + 5 * rmsPed[ii * 72 + jj];
 
                 H2->Fill(ii, jj, array3D[i][ii][jj]);
-                
-                // sumsig = sumsig + a.getP(ii, jj)[0];
             }
         }
 
@@ -273,11 +282,17 @@ int mdat_cut_pede_binaryzation_cluster()
                 ivec[ii][jj] = array3D[i][ii][jj];
             }
             H3->Fill(ii, jj, ivec[ii][jj]);
+            sumsig_ADC = sumsig_ADC + ivec[ii][jj];
         }
     }
 
+    ivec_sumsigADC.push_back(i);
+    ivec_sumsigADC.push_back(sumsig_ADC);
+    // cout << "ADC of frame: " << i << "," << "frame: " << ivec_sumsigADC[2*i] << " ,sumsig_ADC: " << sumsig_ADC << " ,ivec_sumsigADC: " << ivec_sumsigADC[2*i+1] <<endl;
+    // cout << ivec_sumsigADC[2*i] << " : " << ivec_sumsigADC[2*i+1] <<endl;
+
     c1->cd(1);
-    sprintf(str2, "frame %d", i);
+    sprintf(str2, "%s frame %d", inDataFile, i);
     H2->SetTitle(str2);
     H2->GetZaxis()->SetRangeUser(min2d, max2d);
     // H2->SetFillColor(1);
@@ -285,14 +300,14 @@ int mdat_cut_pede_binaryzation_cluster()
     H2->Draw("Colz");
     
     c1->cd(2);
-    sprintf(str3, "frame %d", i);
+    sprintf(str3, "%s frame %d", inDataFile, i);
     H3->SetTitle(str3);
     H3->GetZaxis()->SetRangeUser(min2d, max2d);
     H3->SetStats(0);
     H3->Draw("Colz");
     c1->Update();  
 
-        // if (i == 75)
+        // if (57 <= i && i <= 75)
         // {
         //     char buf[100];
         //     sprintf(&buf[0], "./mdat_frame%d_0_1.png", i);
@@ -304,14 +319,54 @@ int mdat_cut_pede_binaryzation_cluster()
     sum_ivec.clear();
     vc.clear();
 
-    // if(i >= 57)
+    // if(i >= 50)
     // {
     //     sleep(1);//second
     // }
 
     if (gSystem->ProcessEvents()) //不能去除，否则没有动画
         break;
+    }//end for (int i = 0; i < iFrames; i++)
+
+//*******************extract good cluster*******************************
+    for(int i = 1; i < ivec_sumsigADC.size() / 2; i++)//第一帧的束团可能为上一个文件的图像，不能取
+    {
+        if(ivec_sumsigADC[2*i+1] != 0)
+        {
+            if(ivec_sumsigADC[2*i+1] > ivec_sumsigADC[2*i-1])
+            {
+                ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2*i]);
+                ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2*i+1]);
+            }
+        }
+        else
+        {
+            continue;
+        }
     }
+
+    for(int i = 0; i < ivec_sumsigADC_filter.size() / 2; i++)
+    {
+        cout << ivec_sumsigADC_filter[2*i] << ":" << ivec_sumsigADC_filter[2*i+1] << endl;
+        // for()
+        // {
+
+        // }
+        // unsigned short _data_short_m[NX][NY];
+
+        // for (int ii = 0; ii < NX; ii++)
+        // {
+        //     for (int jj = 0; jj < NY; jj++)
+        //     {
+        //         output_m.write((char *)(&_data_short), sizeof(_data_short));
+        //     }
+        // }
+    }
+//*******************extract good cluster*******************************
+
+//*******************extract good cluster to new file*******************************
+
+//*******************extract good cluster to new file*******************************
 
     infileSig.close();
     infilePede.close();

@@ -31,7 +31,8 @@ void mdat_cut_pede()
     // int ldata;//read for .dat
     //  unsigned short ldata;//read for .mdat
     char inPdedFile[] = "../data/pede.txt";
-    char inDataFile[] = "../data/out5.mdat";
+    // char inDataFile[] = "../data/out5.mdat";
+    char inDataFile[] = "../data/out7.mdat";
     char output_txt[] = "./output_txt.dat"; //for debug
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
@@ -102,22 +103,22 @@ void mdat_cut_pede()
         c1->Modified();
         c1->Update();
 
-        if(i == 75){
-            char buf[100];
-            sprintf(&buf[0],"./mdat_frame%d.png",i);
-            c1->SaveAs(buf);
-        }
+        // if(i == 75){
+        //     char buf[100];
+        //     sprintf(&buf[0],"./mdat_frame%d.png",i);
+        //     c1->SaveAs(buf);
+        // }
 
-        if(i == 75){
-            for (int ii = 0; ii < NX; ii++)
-            {
-                for (int jj = 0; jj < NY; jj++)
-                {
-                    output << fixed << setprecision(0) <<setiosflags(ios::left)<< setw(3) << array3D[i][ii][jj] << ",";
-                }
-                output << "xxxxxx "<< endl;
-            }
-        }
+        // if(i == 75){
+        //     for (int ii = 0; ii < NX; ii++)
+        //     {
+        //         for (int jj = 0; jj < NY; jj++)
+        //         {
+        //             output << fixed << setprecision(0) <<setiosflags(ios::left)<< setw(3) << array3D[i][ii][jj] << ",";
+        //         }
+        //         output << "xxxxxx "<< endl;
+        //     }
+        // }
 
         if (gSystem->ProcessEvents()) //不能去除，否则没有动画
             break;
