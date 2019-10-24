@@ -32,7 +32,8 @@ void mdat_cut_pede()
     //  unsigned short ldata;//read for .mdat
     char inPdedFile[] = "../data/pede.txt";
     // char inDataFile[] = "../data/out5.mdat";
-    char inDataFile[] = "../data/out7.mdat";
+    // char inDataFile[] = "../data/out7.mdat";
+    char inDataFile[] = "../data/out_extract.mdat";
     char output_txt[] = "./output_txt.dat"; //for debug
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
@@ -44,8 +45,8 @@ void mdat_cut_pede()
     while (!infilePede.eof() && iCounter < 5184)
     {
         infilePede >> iChipT >> iPixelT >> pedestalT >> noiseT;
-        meanPed[iCounter] = pedestalT;
-        // meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat-------->3/3
+        // meanPed[iCounter] = pedestalT;
+        meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat-------->3/3
         // rmsPed[iChipT*nPixelsOnChip+iPixelT] = noiseT;
         iCounter++;
         // cout << pedestalT << endl;
@@ -53,6 +54,7 @@ void mdat_cut_pede()
 
     //////////////////////////////////////////////////How many Frame counts
     unsigned short _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1
+    // int _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1-------->2/3
     int fz = file_loder::file_size(inDataFile);
     cout << "the size of file is: " << fz << endl;
     int iFrames = 0;
@@ -77,12 +79,13 @@ void mdat_cut_pede()
     ofstream output;
     output.open(output_txt);//清空模式
 
-    // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i < 76; i++)
+    for (int i = 0; i < iFrames; i++)
+    // for (int i = 0; i < 2; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         sumsig = 0;
-        unsigned short _data_short[NX][NY];
+        unsigned short _data_short[NX][NY];//for .mdat
+        // int _data_short[NX][NY];//for .dat-------->1/3
         infileSig.read((char *)(&_data_short), sizeof(_data_short));
         for (int ii = 0; ii < NX; ii++)
         {
@@ -104,10 +107,13 @@ void mdat_cut_pede()
         c1->Update();
 
         // if(i == 75){
-        //     char buf[100];
-        //     sprintf(&buf[0],"./mdat_frame%d.png",i);
-        //     c1->SaveAs(buf);
+            char buf[100];
+            sprintf(&buf[0],"./mdat_frame%d_%d.png",i,sumsig);
+            c1->SaveAs(buf);
         // }
+
+        sleep(1);//second
+    // usleep(1000000); // will sleep for 1s
 
         // if(i == 75){
         //     for (int ii = 0; ii < NX; ii++)

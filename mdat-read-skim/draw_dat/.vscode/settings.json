@@ -23,6 +23,7 @@
         "loader_file.h": "c",
         "string.h": "c",
         "__split_buffer": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "stdio.h": "c"
     }
 }
