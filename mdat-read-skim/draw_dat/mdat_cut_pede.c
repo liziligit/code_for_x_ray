@@ -30,11 +30,16 @@ void mdat_cut_pede()
     int sumsig;
     // int ldata;//read for .dat
     //  unsigned short ldata;//read for .mdat
-    char inPdedFile[] = "../data/pede.txt";
+    // char inPdedFile[] = "../data/pede.txt";
+    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2.mdat";
+    // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out1.mdat";
+    char inDataFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/101-200.mdat";
     // char inDataFile[] = "../data/out5.mdat";
     // char inDataFile[] = "../data/out7.mdat";
-    char inDataFile[] = "../data/out_extract.mdat";
+    // char inDataFile[] = "../data/extract55Fe01_0_3000.mdat";
     char output_txt[] = "./output_txt.dat"; //for debug
+    char output_energy[] = "./output_energy_0_3000.dat"; //for energy spectrum
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
 
@@ -79,6 +84,9 @@ void mdat_cut_pede()
     ofstream output;
     output.open(output_txt);//清空模式
 
+    ofstream output2;
+    output2.open(output_energy);//清空模式
+
     for (int i = 0; i < iFrames; i++)
     // for (int i = 0; i < 2; i++)
     {
@@ -97,6 +105,7 @@ void mdat_cut_pede()
             }
         }
 
+        output2 << fixed << setprecision(0) <<setiosflags(ios::left)<< setw(5) << i << " " << sumsig << endl;
         cout << i << ":" << sumsig << endl;
         sprintf(str, "frame %d", i);
         H2->SetTitle(str);
@@ -107,13 +116,13 @@ void mdat_cut_pede()
         c1->Update();
 
         // if(i == 75){
-            char buf[100];
-            sprintf(&buf[0],"./mdat_frame%d_%d.png",i,sumsig);
-            c1->SaveAs(buf);
+            // char buf[100];
+            // sprintf(&buf[0],"./mdat_frame%d_%d.png",i,sumsig);
+            // c1->SaveAs(buf);
         // }
 
-        sleep(1);//second
-    // usleep(1000000); // will sleep for 1s
+        // sleep(1);//second
+        // usleep(1000000); // will sleep for 1s
 
         // if(i == 75){
         //     for (int ii = 0; ii < NX; ii++)
@@ -133,4 +142,5 @@ void mdat_cut_pede()
     infileSig.close();
     infilePede.close();
     output.close();
+    output2.close();
 }

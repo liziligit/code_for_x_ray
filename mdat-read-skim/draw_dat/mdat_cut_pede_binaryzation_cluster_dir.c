@@ -1,6 +1,7 @@
+//可连续操作目录中的多个mdat后缀的文件
 //find cluster in matrix for tometal-ii-
 //image binaryzation and extract cluster
-//author Lizili 20191020
+//author Lizili 20191031
 
 //problem
 //5-176右边界去除
@@ -9,12 +10,64 @@
 //7-277下边界去除
 //7-57中间第二大斑点删除v
 //7-50中间斑点显示
+#include <TCanvas.h>//for Tcanvas
+#include <TH2.h>//for TH2F
+// #include <TApplication.h>//for gSystem
+// #include <TFile.h>
+// #include <TProfile.h>
+// #include <TFrame.h>
+// #include <TRandom3.h>
+// #include "TThread.h"
+// #include <TNtuple.h>
+// #include <TSystem.h>
+// #include <TBenchmark.h>
+// #include <TInterpreter.h>
+// #include <TROOT.h>
 
+
+// #include <unistd.h>
 // #include <vector>
-// #include <unistd.h>//sleep(s)
-#include <stdio.h> //创建文件夹
+#include "TThread.h"
+#include <TFile.h>
+#include <TNtuple.h>
+#include <TH2.h>
+#include <TProfile.h>
+#include <TCanvas.h>
+#include <TFrame.h>
+#include <TROOT.h>
+#include <TSystem.h>
+// #include <TRandom3.h>
+#include <TBenchmark.h>
+#include <TInterpreter.h>
+#include <TApplication.h>
+// #include <iostream>
+#include <stdlib.h>
+
+
+#include <stdio.h> //sprintf()
+#include <iostream>
+#include <fstream> 
+#include <vector>
+#include <unistd.h>//sleep(s)
+#include <sys/types.h>   //opendir()
+#include <dirent.h>      //opendir()
+#include "TGraph.h"
 #include "loader_file.h"
 using namespace std;
+
+int extractId(string &nameId, string head, string tail)
+{
+    //nameId like beam_1.pd1, get lenghth of all parts
+    int total = nameId.length();
+    int tailLength = tail.length(); //for .mdat
+    int headLength = head.length(); //for out
+    if (nameId.substr(0, headLength) != head)
+        return -1;
+
+    int dataLength = total - tailLength - headLength;
+    string num = nameId.substr(headLength, dataLength); //获得从headlength开始，长度为dataLength的字符串
+    return atoi(num.c_str());
+}
 
 class binArray
 {
@@ -70,18 +123,21 @@ int cluster(int x, int y, vector<int> &vx, binArray &a)
     return 0;
 };
 
-int mdat_cut_pede_binaryzation_cluster()
+int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由energy.sh输入参数
+// int mdat_cut_pede_binaryzation_cluster_dir()//他程序中手动设置参数
 {
-    TCanvas *c1 = new TCanvas("c1", "Canvas", 0, 0, 1200, 600);
-    c1->Divide(2, 1);
-    TH2F *H2;
-    TH2F *H3;
+    // TCanvas *c1 = new TCanvas("c1", "Canvas", 0, 0, 1200, 600);
+    // c1->Divide(2, 1);
+    // TH2F *H2;
+    // TH2F *H3;
+    
     const int min2d = -10;
     const int max2d = 10;
     const int NX = 72;
     const int NY = 72;
     char str2[30];
     char str3[30];
+    char inDataFile[200];
     int sumsig_ADC;
     double cog_x = 0;
     double cog_y = 0;
@@ -116,9 +172,12 @@ int mdat_cut_pede_binaryzation_cluster()
     vector<int> isBoundary; //非边界束团则标记为0，是边界束团则标记为1
     isBoundary.clear();
 
-    char inPdedFile[] = "../data/pede.txt";
+    // char inPdedFile[] = "../data/pede.txt";
+    // char beamfn[] = "../data/";
+    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
     // char inDataFile[] = "../data/out5.mdat";
-    char inDataFile[] = "../data/out6.mdat";
+    // char inDataFile[] = "../data/out6.mdat";
     // char inDataFile[] = "../data/out7.mdat";
     // char inDataFile[] = "../data/out8.mdat";
     // char inDataFile[] = "../data/out9.mdat";
@@ -126,12 +185,56 @@ int mdat_cut_pede_binaryzation_cluster()
     // char inDataFile[] = "../data/out11.mdat";
     // char inDataFile[] = "../data/out12.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
-    char output_mdat[] = "../data/out_extract.mdat"; //for debug
-    ifstream infilePede(inPdedFile);
-    ifstream infileSig(inDataFile, ios::binary);
-    ofstream output_m(output_mdat, ios::out | ios::binary | ios::app);
+    char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/"; //for debug
+    // int iStart_num = 0;
+    // int iAccout = 10;
+    char output_mdat[200];
+    sprintf(output_mdat, "%s%d-%d.mdat", output_mdat_dir, iStart_num + 1, iStart_num + iAccout);
+
+    // ofstream output_m(output_mdat, ios::out | ios::binary | ios::app);//追加模式
+    ofstream output_m(output_mdat, ios::out | ios::binary | ios::trunc);//清空模式
+
+    vector<string> name_id;
+
+    DIR *dir;
+    struct dirent *ptr;
+    dir = opendir(beamfn); //打开一个目录
+
+    cout << inPdedFile << endl;
+    cout << beamfn << "out*.mdat" << endl;
+
+    while ((ptr = readdir(dir)) != NULL) //循环读取目录数据
+    {
+        name_id.push_back(ptr->d_name);
+    }
+    closedir(dir); //关闭目录指针
+    vector<int> idList;//extract id number
+
+    for (std::vector<int>::size_type j = 0; j < name_id.size(); j++)
+    {
+        int eId = extractId(name_id[j], "out", ".mdat");
+        if (eId >= 0)
+        {
+            idList.push_back(eId);
+        }
+    }
+
+    //sort number into list point to name_id
+    //sort is not necessary if id is already  in order
+    sort(idList.begin(), idList.end());
+    // for (std::vector<int>::size_type j = 0; j < idList.size(); j++)//显示所有mdat文件编号
+    // {
+    //     cout << idList[j] << ' ';
+    // }
+    // cout << "!!!" << endl;
+    cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files"
+         << " -> "
+         << "[" << idList.front() << "..." << idList.back() << "]" << endl;
+
+    cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
 
     //////////////////////////////////////////////////read Pede
+    ifstream infilePede(inPdedFile);
     int iChipT = 0, iPixelT = 0, iCounter = 0;
     float pedestalT = 0., noiseT = 0.;
     float meanPed[5184];
@@ -145,6 +248,16 @@ int mdat_cut_pede_binaryzation_cluster()
         rmsPed[iCounter] = noiseT;
         iCounter++;
     }
+
+    // ofstream output;
+    // output.open(output_txt);//覆盖模式
+for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
+{   
+    // sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
+    sprintf(inDataFile, "%sout%d.mdat", beamfn, idList[fileId]);
+    cout << inDataFile << endl;
+    ifstream infileSig(inDataFile, ios::binary);
+
     //////////////////////////////////////////////////How many Frame counts
     unsigned short _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1
     int fz = file_loder::file_size(inDataFile);
@@ -164,14 +277,11 @@ int mdat_cut_pede_binaryzation_cluster()
     vector<vector<vector<unsigned short> > > ivec(DEPTH, vector<vector<unsigned short>>(HEIGHT, vector<unsigned short>(LONGTH, 0)));
     //*******************for 3D array*******************************
 
-    // ofstream output;
-    // output.open(output_txt);//覆盖模式
-
     for (int i = 0; i < iFrames; i++)
     // for (int i = 0; i <= 45; i++)
     {
-        H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
-        H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
+        // H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
+        // H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         sumsig_ADC = 0;
         unsigned short _data_short[NX][NY];
         infileSig.read((char *)(&_data_short), sizeof(_data_short));
@@ -188,7 +298,7 @@ int mdat_cut_pede_binaryzation_cluster()
 
                 array3D[i][ii][jj] = array3D[i][ii][jj] + 5 * rmsPed[ii * 72 + jj];
 
-                H2->Fill(ii, jj, array3D[i][ii][jj]);
+                // H2->Fill(ii, jj, array3D[i][ii][jj]);
             }
         }
 
@@ -207,12 +317,12 @@ int mdat_cut_pede_binaryzation_cluster()
         //*******************del boundary and mini isolate cluster*******************************
         vector<int> sum_ivec(vc.size(), 0);    //束团ADC的值
         int index_max = 0;                     //index_max用于接收最大值下标
-        for (int ii = 0; ii < vc.size(); ii++) //vc中的vector元素的个数，即一帧中束团的个数
+        for (std::vector<vector<int> >::size_type ii = 0; ii < vc.size(); ii++) //vc中的vector元素的个数，即一帧中束团的个数
         {
             //*******************只保留特定像素数量的束团*******************************
             if (vc[ii].size() / 2 <= mini_cluster_size_area) //像素个数少于一定量，则删除
             {
-                for (int jj = 0; jj < vc[ii].size(); jj++) //vc中第i个vector元素的长度
+                for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++) //vc中第i个vector元素的长度
                 {
                     if (jj % 2 == 0)
                     {
@@ -222,11 +332,11 @@ int mdat_cut_pede_binaryzation_cluster()
             }
             //*******************只保留特定像素数量的束团*******************************
             //*******************去除边界束团*****************************************
-            for (int jj = 0; jj < vc[ii].size(); jj++)
+            for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++)
             {
                 if (vc[ii][jj] == 0 || vc[ii][jj] == a.nCol - 1) //边界的删除
                 {
-                    for (int jj = 0; jj < vc[ii].size(); jj++)
+                    for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++)
                     {
                         if (jj % 2 == 0)
                         {
@@ -238,7 +348,7 @@ int mdat_cut_pede_binaryzation_cluster()
             }
             //*******************去除边界束团*****************************************
             sum_ivec[ii] = 0;
-            for (int jj = 0; jj < vc[ii].size(); jj++)
+            for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++)
             {
                 if (jj % 2 == 0)
                 {
@@ -249,7 +359,7 @@ int mdat_cut_pede_binaryzation_cluster()
         } //end for (int ii = 0; ii < vc.size(); ii++) //vc中的vector元素的个数，即束团的个数
 
         //*******************找到最大束团的下标位置*******************************
-        for (int i_sum_ivec = 0; i_sum_ivec < sum_ivec.size(); ++i_sum_ivec) //找最大束团值及坐标
+        for (std::vector<int>::size_type i_sum_ivec = 0; i_sum_ivec < sum_ivec.size(); ++i_sum_ivec) //找最大束团值及坐标
         {
             if (sum_ivec[i_sum_ivec] > sum_ivec[index_max])
             {
@@ -260,11 +370,11 @@ int mdat_cut_pede_binaryzation_cluster()
         // cout << "pixels counts=" << sum_ivec[index_max] << ",index_max=" << index_max << endl;//束团中像素的个数，vc.size()为0时不能输出
 
         //*******************剩余束团中，只保留最大的*******************************
-        for (int ii = 0; ii < vc.size(); ii++)
+        for (std::vector<vector<int> >::size_type ii = 0; ii < vc.size(); ii++)
         {
-            for (int jj = 0; jj < vc[ii].size(); jj++)
+            for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++)
             {
-                if (ii == index_max)
+                if ((int)ii == index_max)
                 {
                     continue;
                 }
@@ -289,7 +399,7 @@ int mdat_cut_pede_binaryzation_cluster()
                 {
                     ivec[i][ii][jj] = array3D[i][ii][jj];
                 }
-                H3->Fill(ii, jj, ivec[i][ii][jj]);
+                // H3->Fill(ii, jj, ivec[i][ii][jj]);
                 sumsig_ADC = sumsig_ADC + ivec[i][ii][jj];
             }
         }
@@ -298,21 +408,21 @@ int mdat_cut_pede_binaryzation_cluster()
         ivec_sumsigADC.push_back(sumsig_ADC);
         // cout << ivec_sumsigADC[2 * i] << " : " << ivec_sumsigADC[2 * i + 1] << endl; //显示每帧的ADC值和
 
-        c1->cd(1);
-        sprintf(str2, "%s frame %d", inDataFile, i);
-        H2->SetTitle(str2);
-        H2->GetZaxis()->SetRangeUser(min2d, max2d);
-        // H2->SetFillColor(1);
-        H2->SetStats(0);
-        H2->Draw("Colz");
+        // c1->cd(1);
+        // sprintf(str2, "%s frame %d", inDataFile, i);
+        // H2->SetTitle(str2);
+        // H2->GetZaxis()->SetRangeUser(min2d, max2d);
+        // // H2->SetFillColor(1);
+        // H2->SetStats(0);
+        // H2->Draw("Colz");
 
-        c1->cd(2);
-        sprintf(str3, "%s frame %d", inDataFile, i);
-        H3->SetTitle(str3);
-        H3->GetZaxis()->SetRangeUser(min2d, max2d);
-        H3->SetStats(0);
-        H3->Draw("Colz");
-        c1->Update();
+        // c1->cd(2);
+        // sprintf(str3, "%s frame %d", inDataFile, i);
+        // H3->SetTitle(str3);
+        // H3->GetZaxis()->SetRangeUser(min2d, max2d);
+        // H3->SetStats(0);
+        // H3->Draw("Colz");
+        // c1->Update();
 
         // createFolder("./6");
         // if (335 <= i && i <= 348)
@@ -332,12 +442,12 @@ int mdat_cut_pede_binaryzation_cluster()
         //     sleep(5);//second
         // }
 
-        if (gSystem->ProcessEvents()) //不能去除，否则没有动画
-            break;
+        // if (gSystem->ProcessEvents()) //不能去除，否则没有动画
+        //     break;
     } //end for (int i = 0; i < iFrames; i++)
 
     //*******************extract good cluster*******************************
-    for (int i = 1; i < ivec_sumsigADC.size() / 2 - 1; i++) //第一帧的束团可能为上一个文件的图像，不能取
+    for (std::vector<int>::size_type i = 1; i < ivec_sumsigADC.size() / 2 - 1; i++) //第一帧的束团可能为上一个文件的图像，不能取
     {
         if (ivec_sumsigADC[2 * i + 1] != 0)
         {
@@ -355,7 +465,7 @@ int mdat_cut_pede_binaryzation_cluster()
         }
     }
 //*******************求最终束团的重心*******************************
-    for(int i = 0; i < ivec_sumsigADC_filter.size() / 2; i++)
+    for(std::vector<int>::size_type i = 0; i < ivec_sumsigADC_filter.size() / 2; i++)
     {
         up_x = 0;
         up_y = 0;
@@ -386,18 +496,18 @@ int mdat_cut_pede_binaryzation_cluster()
 //*******************求最终束团的重心*******************************
 
     int iCount_exract = 0;
-    for (int i = 0; i < ivec_sumsigADC_filter.size() / 2; i++)
+    for (std::vector<int>::size_type i = 0; i < ivec_sumsigADC_filter.size() / 2; i++)
     {
         if (ivec_sumsigADC_filter[2 * i + 1] != 0)
         {
-            cout << ivec_sumsigADC_filter[2 * i] << ":" << ivec_sumsigADC_filter[2 * i + 1] << endl;
+            // cout << ivec_sumsigADC_filter[2 * i] << ":" << ivec_sumsigADC_filter[2 * i + 1] << endl;
 
             for (int ii = 0; ii < NX; ii++)
             {
                 for (int jj = 0; jj < NY; jj++)
                 {
                     //只输出有束团的帧到文件
-                    // output_m.write((char *)(&ivec[ivec_sumsigADC_filter[2 * i]][ii][jj]), sizeof(ivec[ivec_sumsigADC_filter[2 * i]][ii][jj])); //extract to file
+                    output_m.write((char *)(&ivec[ivec_sumsigADC_filter[2 * i]][ii][jj]), sizeof(ivec[ivec_sumsigADC_filter[2 * i]][ii][jj])); //extract to file
                 }
             }
             iCount_exract++;
@@ -417,10 +527,11 @@ int mdat_cut_pede_binaryzation_cluster()
     ivec_sumsigADC_filter.clear();
     array3D.clear();
     ivec.clear();
+    name_id.clear();
 
-    output_m.close();
-    infileSig.close();
+    infileSig.close();  
+}
     infilePede.close();
-
+    output_m.close();
     return 0;
 }
