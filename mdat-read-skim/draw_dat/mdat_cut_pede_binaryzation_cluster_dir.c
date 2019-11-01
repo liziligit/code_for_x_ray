@@ -53,6 +53,7 @@
 #include <dirent.h>      //opendir()
 #include "TGraph.h"
 #include "loader_file.h"
+#include "cluster.h"
 using namespace std;
 
 int extractId(string &nameId, string head, string tail)
@@ -68,60 +69,6 @@ int extractId(string &nameId, string head, string tail)
     string num = nameId.substr(headLength, dataLength); //获得从headlength开始，长度为dataLength的字符串
     return atoi(num.c_str());
 }
-
-class binArray
-{
-public:
-    int nCol;
-    int nRow;
-    int *d;
-
-    int get(int x, int y)
-    {
-        if (x < 0)
-            return 0;
-        if (x >= nCol)
-            return 0;
-        if (y < 0)
-            return 0;
-        if (y >= nRow)
-            return 0;
-
-        return d[nRow * x + y];
-    }
-    int *getP(int x, int y)
-    {
-        return d + nRow * x + y;
-    }
-};
-
-int cluster(int x, int y, vector<int> &vx, binArray &a)
-{
-    a.getP(x, y)[0] = 0; //当前像素值设为0
-
-    if (a.get(x + 1, y) == 1)
-        cluster(x + 1, y, vx, a);
-    if (a.get(x, y + 1) == 1)
-        cluster(x, y + 1, vx, a);
-    if (a.get(x - 1, y) == 1)
-        cluster(x - 1, y, vx, a);
-    if (a.get(x, y - 1) == 1)
-        cluster(x, y - 1, vx, a);
-
-    if (a.get(x + 1, y - 1) == 1)
-        cluster(x + 1, y - 1, vx, a);
-    if (a.get(x + 1, y + 1) == 1)
-        cluster(x + 1, y + 1, vx, a);
-    if (a.get(x - 1, y + 1) == 1)
-        cluster(x - 1, y + 1, vx, a);
-    if (a.get(x - 1, y - 1) == 1)
-        cluster(x - 1, y - 1, vx, a);
-
-    vx.push_back(x);
-    vx.push_back(y);
-
-    return 0;
-};
 
 int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由energy.sh输入参数
 // int mdat_cut_pede_binaryzation_cluster_dir()//他程序中手动设置参数
@@ -176,6 +123,12 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     // char beamfn[] = "../data/";
     char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
     char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
+
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/";
+
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/";
     // char inDataFile[] = "../data/out5.mdat";
     // char inDataFile[] = "../data/out6.mdat";
     // char inDataFile[] = "../data/out7.mdat";
@@ -186,6 +139,8 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     // char inDataFile[] = "../data/out12.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
     char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/"; //for debug
+    // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/"; //for debug
+    // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/"; //for debug
     // int iStart_num = 0;
     // int iAccout = 10;
     char output_mdat[200];

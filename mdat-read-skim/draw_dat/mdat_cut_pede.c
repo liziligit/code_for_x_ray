@@ -1,3 +1,5 @@
+//去除本底，显示图像
+
 // #include "TROOT.h"
 // #include "TFile.h"
 // #include "TTree.h"
@@ -31,15 +33,29 @@ void mdat_cut_pede()
     // int ldata;//read for .dat
     //  unsigned short ldata;//read for .mdat
     // char inPdedFile[] = "../data/pede.txt";
-    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2.mdat";
-    // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out1.mdat";
-    char inDataFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/101-200.mdat";
+    char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    char inDataFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/1-100.mdat";
+
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
+    // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/out2.mdat";
+    // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
+    // char inDataFile[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/8901-9000.mdat";
+
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
+    // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/out6666.mdat";
+    // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
+    // char inDataFile[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/5601-5700.mdat";
+
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";
+    // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/out2085.mdat";
+
     // char inDataFile[] = "../data/out5.mdat";
     // char inDataFile[] = "../data/out7.mdat";
     // char inDataFile[] = "../data/extract55Fe01_0_3000.mdat";
-    char output_txt[] = "./output_txt.dat"; //for debug
-    char output_energy[] = "./output_energy_0_3000.dat"; //for energy spectrum
+    // char output_txt[] = "./output_txt.dat"; //输出72*72矩阵
+    // char output_energy[] = "./output_energy_0_3000.dat"; //输出每帧ADC的和
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
 
@@ -81,11 +97,11 @@ void mdat_cut_pede()
             array3D[i][j].resize(LONGTH); //3
     }
     //////////////////////////////////////////////////for 3D array
-    ofstream output;
-    output.open(output_txt);//清空模式
+    // ofstream output;
+    // output.open(output_txt);//清空模式
 
-    ofstream output2;
-    output2.open(output_energy);//清空模式
+    // ofstream output2;
+    // output2.open(output_energy);//清空模式
 
     for (int i = 0; i < iFrames; i++)
     // for (int i = 0; i < 2; i++)
@@ -105,7 +121,7 @@ void mdat_cut_pede()
             }
         }
 
-        output2 << fixed << setprecision(0) <<setiosflags(ios::left)<< setw(5) << i << " " << sumsig << endl;
+        // output2 << fixed << setprecision(0) <<setiosflags(ios::left)<< setw(5) << i << " " << sumsig << endl;
         cout << i << ":" << sumsig << endl;
         sprintf(str, "frame %d", i);
         H2->SetTitle(str);
@@ -141,6 +157,6 @@ void mdat_cut_pede()
 
     infileSig.close();
     infilePede.close();
-    output.close();
-    output2.close();
+    // output.close();
+    // output2.close();
 }

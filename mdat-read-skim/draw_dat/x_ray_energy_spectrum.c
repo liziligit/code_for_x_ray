@@ -24,18 +24,20 @@ int x_ray_energy_spectrum()
     // char col01[100], col03[100];
     int col01, col02;
 
-    gStyle->SetOptStat(1);
+    gStyle->SetOptStat(1111);
     //   gStyle->SetOptFit();//1011
 
     TCanvas *c1 = new TCanvas("c1", "stacked hists", 500, 500);
 
-    TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 100, 1, 15000);
+    // TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 120, 0, 12000);
+    // TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 80, 0, 8000);
+    TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 100, 0, 10000);
 
     chip01->SetLineColor(kRed);
 
     char inputfile01[100];
 
-    sprintf(inputfile01, "output_energy_0_3000.dat");
+    sprintf(inputfile01, "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/00_output_energy_1_5665.dat");
 
     FILE *fp01 = fopen(inputfile01, "r");
     if (!fp01)
@@ -47,7 +49,9 @@ int x_ray_energy_spectrum()
     //   }
 
     int Lines = 0;
-    int num = 23808;
+    // int num = 69359;
+    // int num = 62178;
+    int num = 33342;
 
     for (Lines = 0; Lines < num; Lines++)
     {
@@ -65,11 +69,11 @@ int x_ray_energy_spectrum()
     }
 
     chip01->Draw();
-    // TF1 * f = new TF1("f","gaus");
-    // chip01->Fit(f,"Q");
-    // chip01->Fit("gaus","Q");//gaus fit
-    // chip01->Fit("gaus");//fit beamProfileX
-    chip01->Fit("gaus","R","",2500,12000);//fit beamProfileX, no show parameter
+    // chip01->Fit("gaus","Q");//gaus fit，Q is Quiet mode
+    // chip01->Fit("gaus");//fit chip01
+    // chip01->Fit("gaus","R","",2700,12000);//R is Use the range speciﬁed in the function range
+    // chip01->Fit("gaus","R","",680,4000);//R is Use the range speciﬁed in the function range
+    chip01->Fit("gaus","R","",100,6000);//R is Use the range speciﬁed in the function range
 
     TLatex l1;
     l1.SetTextFont(42);
@@ -82,7 +86,7 @@ int x_ray_energy_spectrum()
     l2.SetTextAlign(21);
     l2.SetTextSize(.04);
     l2.SetTextAngle(90);
-    l2.DrawLatexNDC(.05, .5, "Count");
+    l2.DrawLatexNDC(.03, .5, "Count");
 
     TLatex l3;
     l3.SetTextFont(42);
@@ -90,9 +94,11 @@ int x_ray_energy_spectrum()
     l3.SetTextSize(.04);
     l3.SetTextAngle(0);
     l3.SetTextColor(kBlue);
-    l3.DrawLatexNDC(.27, .52, "energy count");
+    l3.DrawLatexNDC(.63, .64, "Energy count");
 
-    // c1->SaveAs(TString::Format("./Hitmap_pos.pdf"));
+    // c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-55Fe.png"));
+    // c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV760IV300-55Fe.png"));
+    c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV770IV300-X-ray-generator.png"));
 
     fclose(fp01);
     // fclose(fp02);

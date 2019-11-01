@@ -4,3 +4,5 @@
 .DS_Store
 
 *.mdat
+
+mdat-read-skim/data/
