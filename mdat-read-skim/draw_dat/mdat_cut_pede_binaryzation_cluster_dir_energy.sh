@@ -1,4 +1,4 @@
-for i in `seq 1 100`
+for i in `seq 1 1`
 do
 	echo $i
 	root -L -l -q -b "mdat_cut_pede_binaryzation_cluster_dir_energy.c++((${i}-1)*100,100)"
