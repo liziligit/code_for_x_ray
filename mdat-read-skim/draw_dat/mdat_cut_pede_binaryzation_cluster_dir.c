@@ -98,7 +98,7 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     a.nRow = NX;
     a.nCol = NY;
     a.d = new int[a.nRow * a.nCol];
-    const int mini_cluster_size_area = 20; //像素个数小于10个，就删除
+    const int mini_cluster_size_area = 70; //像素个数小于10个，就删除
     for (int i = 0; i < a.nRow; i++)
     {
         for (int j = 0; j < a.nCol; j++)
@@ -138,7 +138,7 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     // char inDataFile[] = "../data/out11.mdat";
     // char inDataFile[] = "../data/out12.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
-    char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/"; //for debug
+    char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-70/"; //for debug
     // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/"; //for debug
     // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/"; //for debug
     // int iStart_num = 0;
@@ -437,7 +437,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
         cog_x = up_x / down_x;
         cog_y = up_y / down_x;
 
-        cout << "(" << cog_x << "," << cog_y << ")"<< endl;
+        // cout << "(" << cog_x << "," << cog_y << ")"<< endl;//输出重心坐标
 
         if (boundary_max <= cog_x || cog_x <= boundary_min || boundary_max <= cog_y || cog_y <= boundary_min)
         {
@@ -473,7 +473,6 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
         }
     }
 
-    // cout << "extract "<< ivec_sumsigADC_filter.size() / 2 << " frame"<< endl;
     cout << "extract "<< iCount_exract << " frame"<< endl;
 
     //*******************extract good cluster*******************************
