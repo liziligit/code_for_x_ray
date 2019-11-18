@@ -33,10 +33,10 @@ void mdat_cut_pede()
     // int ldata;//read for .dat
     //  unsigned short ldata;//read for .mdat
     // char inPdedFile[] = "../data/pede.txt";
-    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
-    // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2.mdat";
-    char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
-    char inDataFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/1-100.mdat";
+    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2.mdat";
+    // char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    // char inDataFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/1-100.mdat";
 
     // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/out2.mdat";
@@ -66,8 +66,8 @@ void mdat_cut_pede()
     while (!infilePede.eof() && iCounter < 5184)
     {
         infilePede >> iChipT >> iPixelT >> pedestalT >> noiseT;
-        // meanPed[iCounter] = pedestalT;
-        meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat-------->3/3
+        meanPed[iCounter] = pedestalT;
+        // meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat-------->3/3
         // rmsPed[iChipT*nPixelsOnChip+iPixelT] = noiseT;
         iCounter++;
         // cout << pedestalT << endl;

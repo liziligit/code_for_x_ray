@@ -1,7 +1,8 @@
 //可连续操作目录中的多个mdat后缀的文件
 //find cluster in matrix for tometal-ii-
 //image binaryzation and extract cluster
-//author Lizili 20191031
+//画出束团pixel数量分布
+//author Lizili 20191107
 
 //problem
 //5-176右边界去除
@@ -70,14 +71,14 @@ int extractId(string &nameId, string head, string tail)
     return atoi(num.c_str());
 }
 
-int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由energy.sh输入参数
+int mdat_cut_pede_binaryzation_cluster_dir_pixel_num(int iStart_num, int iAccout)//由energy.sh输入参数
 // int mdat_cut_pede_binaryzation_cluster_dir()//他程序中手动设置参数
 {
-    // TCanvas *c1 = new TCanvas("c1", "Canvas", 0, 0, 1200, 600);
+    TCanvas *c1 = new TCanvas("c1", "stacked hists", 500, 500);
     // c1->Divide(2, 1);
     // TH2F *H2;
     // TH2F *H3;
-    
+    TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 60, 0, 300);
     const int min2d = -10;
     const int max2d = 10;
     const int NX = 72;
@@ -98,7 +99,7 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     a.nRow = NX;
     a.nCol = NY;
     a.d = new int[a.nRow * a.nCol];
-    const int mini_cluster_size_area = 20; //像素个数小于10个，就删除
+    const int mini_cluster_size_area = 10; //像素个数小于10个，就删除
     for (int i = 0; i < a.nRow; i++)
     {
         for (int j = 0; j < a.nCol; j++)
@@ -107,25 +108,25 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
         }
     }
 
-    vector<int> vx;
+    vector<int> vx;//依次存放被击中像素的x,y坐标命合集
     vx.clear();
-    vector<vector<int> > vc; //二维向量
+    vector<vector<int> > vc; //二维向量，存放第i个束团中击中像素点的x,y坐标合集
     vc.clear();
 
     vector<int> ivec_sumsigADC; //存放每帧中束团的ADC值的和，没有束团则ADC值的和为0
     ivec_sumsigADC.clear();
     vector<int> ivec_sumsigADC_filter; //存放有束团的帧的ADC值的和，帧数较少
     ivec_sumsigADC_filter.clear();
-    vector<int> isBoundary; //非边界束团则标记为0，是边界束团则标记为1
-    isBoundary.clear();
+    // vector<int> isBoundary; //非边界束团则标记为0，是边界束团则标记为1
+    // isBoundary.clear();
 
     // char inPdedFile[] = "../data/pede.txt";
     // char beamfn[] = "../data/";
-    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
-    char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
 
-    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
-    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/";
+    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
+    char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/";
 
     // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
     // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/";
@@ -138,16 +139,16 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     // char inDataFile[] = "../data/out11.mdat";
     // char inDataFile[] = "../data/out12.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
-    char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-20/"; //for debug
-    // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-30/"; //for debug
+    // char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-70/"; //for debug
+    // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/"; //for debug
     // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/"; //for debug
     // int iStart_num = 0;
     // int iAccout = 10;
-    char output_mdat[200];
-    sprintf(output_mdat, "%s%d-%d.mdat", output_mdat_dir, iStart_num + 1, iStart_num + iAccout);
+    // char output_mdat[200];
+    // sprintf(output_mdat, "%s%d-%d.mdat", output_mdat_dir, iStart_num + 1, iStart_num + iAccout);
 
     // ofstream output_m(output_mdat, ios::out | ios::binary | ios::app);//追加模式
-    ofstream output_m(output_mdat, ios::out | ios::binary | ios::trunc);//清空模式
+    // ofstream output_m(output_mdat, ios::out | ios::binary | ios::trunc);//清空模式
 
     vector<string> name_id;
 
@@ -233,7 +234,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     //*******************for 3D array*******************************
 
     for (int i = 0; i < iFrames; i++)
-    // for (int i = 0; i <= 45; i++)
+    // for (int i = 0; i <= 14; i++)
     {
         // H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         // H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
@@ -275,7 +276,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
         for (std::vector<vector<int> >::size_type ii = 0; ii < vc.size(); ii++) //vc中的vector元素的个数，即一帧中束团的个数
         {
             //*******************只保留特定像素数量的束团*******************************
-            if (vc[ii].size() / 2 <= mini_cluster_size_area) //像素个数少于一定量，则删除
+            if (vc[ii].size() / 2 <= mini_cluster_size_area) //像素个数少于一定量，则删除，即像素值设零
             {
                 for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++) //vc中第i个vector元素的长度
                 {
@@ -289,7 +290,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
             //*******************去除边界束团*****************************************
             for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++)
             {
-                if (vc[ii][jj] == 0 || vc[ii][jj] == a.nCol - 1) //边界的删除
+                if (vc[ii][jj] == 0 || vc[ii][jj] == a.nCol - 1) //边界的删除，即像素值设零
                 {
                     for (std::vector<vector<int> >::size_type jj = 0; jj < vc[ii].size(); jj++)
                     {
@@ -337,7 +338,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
                 {
                     if (jj % 2 == 0)
                     {
-                        ivec[i][vc[ii][jj]][vc[ii][jj + 1]] = 0;
+                        ivec[i][vc[ii][jj]][vc[ii][jj + 1]] = 0;//非最在束团，则删除，即像素值设零
                     }
                 }
             }
@@ -407,7 +408,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
         if (ivec_sumsigADC[2 * i + 1] != 0)
         {
             //提取条件，前1帧须为0，且前后帧不能接触边界，后一帧较小
-            if (ivec_sumsigADC[2 * i + 1 - 2] == 0 &&                      //前1帧
+            if (ivec_sumsigADC[2 * i + 1 - 2] == 0 &&                      //前1帧为0
                 ivec_sumsigADC[2 * i + 1 + 2] < ivec_sumsigADC[2 * i + 1]) //后1帧小些
             {
                 ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2 * i]);
@@ -441,7 +442,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
 
         if (boundary_max <= cog_x || cog_x <= boundary_min || boundary_max <= cog_y || cog_y <= boundary_min)
         {
-            ivec_sumsigADC_filter[2 * i + 1] = 0;
+            ivec_sumsigADC_filter[2 * i + 1] = 0;//边界外的束团，所有像素ADC值的和直接设为0
         }
         else
         {
@@ -451,6 +452,8 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
 //*******************求最终束团的重心*******************************
 
     int iCount_exract = 0;
+    int hit_pixel = 0;
+    int hit_pixel_num = 0;
     for (std::vector<int>::size_type i = 0; i < ivec_sumsigADC_filter.size() / 2; i++)
     {
         if (ivec_sumsigADC_filter[2 * i + 1] != 0)
@@ -462,9 +465,14 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
                 for (int jj = 0; jj < NY; jj++)
                 {
                     //只输出有束团的帧到文件
-                    output_m.write((char *)(&ivec[ivec_sumsigADC_filter[2 * i]][ii][jj]), sizeof(ivec[ivec_sumsigADC_filter[2 * i]][ii][jj])); //extract to file
+                    // output_m.write((char *)(&ivec[ivec_sumsigADC_filter[2 * i]][ii][jj]), sizeof(ivec[ivec_sumsigADC_filter[2 * i]][ii][jj])); //extract to file
+                    hit_pixel = (ivec[ivec_sumsigADC_filter[2 * i]][ii][jj] - 5 * rmsPed[ii * 72 + jj] > 0) ? 1 : 0;
+                    hit_pixel_num = hit_pixel_num + hit_pixel;
                 }
             }
+            // cout << ivec_sumsigADC_filter[2 * i] << ": " << hit_pixel_num << endl;
+            chip01->Fill(hit_pixel_num);
+            hit_pixel_num = 0;
             iCount_exract++;
         }
         else
@@ -473,7 +481,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
         }
     }
 
-    cout << "extract "<< iCount_exract << " frame"<< endl;
+    cout << "extract " << iCount_exract << " frame" << endl;
 
     //*******************extract good cluster*******************************
 
@@ -484,8 +492,11 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     name_id.clear();
 
     infileSig.close();  
-}
+}//end for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
+    chip01->Draw();
+    // c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-55Fe_pixel_num.png"));
+    c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV760IV300-55Fe_pixel_num.png"));
     infilePede.close();
-    output_m.close();
+    // output_m.close();
     return 0;
 }

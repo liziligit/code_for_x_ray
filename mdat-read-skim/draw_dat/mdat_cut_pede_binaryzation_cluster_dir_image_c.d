@@ -182,6 +182,8 @@
 ./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/pthread/qos.h
 ./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/sys/qos.h
 ./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/sys/_types/_mach_port_t.h
+./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: /Applications/root_v6.16.00/include/TStyle.h
+./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: /Applications/root_v6.16.00/include/TColor.h
 ./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: /Applications/root_v6.16.00/include/TGraph.h
 ./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: loader_file.h
 ./mdat_cut_pede_binaryzation_cluster_dir_image_c.so: /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/sys/types.h

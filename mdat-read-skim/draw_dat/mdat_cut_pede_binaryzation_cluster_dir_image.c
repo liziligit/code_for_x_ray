@@ -3,6 +3,8 @@
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TSystem.h>
+#include <TStyle.h>
+// #include <TColor.h>
 // #include "TROOT.h"
 // #include "TFile.h"
 // #include "TTree.h"
@@ -32,8 +34,10 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
     // int iStart_num= 0;
     // int iAccout = 100;
     TH2F *H2;
-    const int min2d = -10;
-    const int max2d = 10;
+    // const int min2d = -10;
+    // const int max2d = 80;
+    int min2d;
+    int max2d;//设置自动颜色范围，请看下面内容
     const int NX = 72;
     const int NY = 72;
     char str[30];
@@ -44,14 +48,17 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
     // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2.mdat";
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out1.mdat";
-    // char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
-    // char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
+    // char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/pede.txt";
+    // char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/";
 
-    // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
-    // char inDataFile_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/";
+    // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-10/pede.txt";
+    // char inDataFile_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-10/";
 
-    char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
-    char inDataFile_dir[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/";
+    // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator5-10/pede.txt";
+    // char inDataFile_dir[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator5-10/";
+
+    char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";//int型，需更改2处
+    char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
 
     char inDataFile[200];
     sprintf(inDataFile, "%s%d-%d.mdat", inDataFile_dir, iStart_num + 1, iStart_num + iAccout);
@@ -74,15 +81,15 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
     {
         infilePede >> iChipT >> iPixelT >> pedestalT >> noiseT;
         // meanPed[iCounter] = pedestalT;
-        meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat-------->3/3
+        meanPed[iCounter] = 0;//pedestalT for .mdat, zero for .dat
         // rmsPed[iChipT*nPixelsOnChip+iPixelT] = noiseT;
         iCounter++;
         // cout << pedestalT << endl;
     }
 
     //////////////////////////////////////////////////How many Frame counts
-    unsigned short _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1
-    // int _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1-------->2/3
+    // unsigned short _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1
+    int _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1-------->2/3
     int fz = file_loder::file_size(inDataFile);
     cout << "the size of file is: " << fz << endl;
     int iFrames = 0;
@@ -110,13 +117,13 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
     // ofstream output2;
     // output2.open(output_energy, ios::out | ios::app);//追加模式
 
-    for (int i = 0; i < iFrames; i++)
-    // for (int i = 0; i < 2; i++)
+    // for (int i = 0; i < iFrames; i++)
+    for (int i = 0; i <= 2317; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         sumsig = 0;
-        unsigned short _data_short[NX][NY];//for .mdat
-        // int _data_short[NX][NY];//for .dat-------->1/3
+        // unsigned short _data_short[NX][NY];//for .mdat
+        int _data_short[NX][NY];//for .dat-------->1/3
         infileSig.read((char *)(&_data_short), sizeof(_data_short));
         for (int ii = 0; ii < NX; ii++)
         {
@@ -128,22 +135,45 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
             }
         }
 
+        max2d = array3D[i][0][0];
+        min2d = array3D[i][0][0];
+
+        for (int ii = 0; ii < NX; ii++)
+        {
+            for (int jj = 0; jj < NY; jj++)
+            {
+                max2d = (array3D[i][ii][jj] > max2d) ? array3D[i][ii][jj] : max2d;
+                min2d = (array3D[i][ii][jj] < max2d) ? array3D[i][ii][jj] : min2d;
+                // a.getP(ii, jj)[0] = (a.getP(ii, jj)[0] > 0) ? 1 : 0;
+            }
+        }
+
         // output2 << fixed << setprecision(0) <<setiosflags(ios::left)<< setw(5) << i << " " << sumsig << endl;
-        // cout << i << ":" << sumsig << endl;
-        // sprintf(str, "frame %d", i);
-        // H2->SetTitle(str);
-        H2->GetZaxis()->SetRangeUser(min2d, max2d);
+        // cout << min2d << ":" << max2d << endl;
+        sprintf(str, "frame %d", i);
+        H2->SetTitle(str);
+        // H2->GetZaxis()->SetRangeUser(min2d, max2d);
+        H2->GetZaxis()->SetRangeUser(min2d - (min2d+max2d) * 0.2, max2d - (min2d+max2d) * 0.1);
+        // gStyle->SetPalette(55);//kRainBow
+        gStyle->SetPalette(104);//kTemperatureMap,-10,80
+        // gStyle->SetPalette(90);//kNeon=90,xxx
+        // gStyle->SetPalette(107);//kVisibleSpectrum=107,
+        // gStyle->SetPalette(56);//kInvertedDarkBodyRadiator=56,
+        // gStyle->SetPalette(87);//kLightTemperature=87
+        // gStyle->SetPalette(kRed);
+        // TColor::InvertPalette();
         H2->Draw("Colz");
         H2->SetStats(0);
         c1->Modified();
         c1->Update();
 
-        // if(i == 75){
+        if(i == 2317){
+            cout << min2d << ":" << max2d << endl;
             char buf[200];
             // sprintf(&buf[0],"../data/Ne10DME-80kPa-DV350GV630IV300-55Fe/images/%d-%d-%d.png" , iStart_num + 1, iStart_num + iAccout, i);
             sprintf(&buf[0],"%simages/%d-%d-%d.png" , inDataFile_dir, iStart_num + 1, iStart_num + iAccout, i);
             c1->SaveAs(buf);
-        // }
+        }
 
         // sleep(1);//second
         // usleep(1000000); // will sleep for 1s
@@ -158,6 +188,8 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
         //         output << "xxxxxx "<< endl;
         //     }
         // }
+        max2d = 0;
+        min2d = 0;
 
         if (gSystem->ProcessEvents()) //不能去除，否则没有动画
             break;

@@ -12,8 +12,12 @@ void mdat_cut_pede_binaryzation()
     char str[30];
     int sumsig;
     
-    char inPdedFile[] = "../data/pede.txt";
-    char inDataFile[] = "../data/out5.mdat";
+    // char inPdedFile[] = "../data/pede.txt";
+    // char inDataFile[] = "../data/out5.mdat";
+
+    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
+    char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out3.mdat";
+
     ifstream infilePede(inPdedFile);
     ifstream infileSig(inDataFile, ios::binary);
 
@@ -56,7 +60,7 @@ void mdat_cut_pede_binaryzation()
     }
     //////////////////////////////////////////////////for 3D array
     // for (int i = 0; i < iFrames; i++)
-    for (int i = 0; i < 76; i++)
+    for (int i = 0; i < 14; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         sumsig = 0;
@@ -91,12 +95,12 @@ void mdat_cut_pede_binaryzation()
         c1->Modified();
         c1->Update();
 
-        if (i == 75)
-        {
-            char buf[100];
-            sprintf(&buf[0], "./mdat_frame%d_0_1.png", i);
-            c1->SaveAs(buf);
-        }
+        // if (i == 75)
+        // {
+        //     char buf[100];
+        //     sprintf(&buf[0], "./mdat_frame%d_0_1.png", i);
+        //     c1->SaveAs(buf);
+        // }
 
         if (gSystem->ProcessEvents()) //不能去除，否则没有动画
             break;

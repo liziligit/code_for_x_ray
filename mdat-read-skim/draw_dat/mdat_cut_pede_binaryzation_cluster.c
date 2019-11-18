@@ -65,7 +65,7 @@ int mdat_cut_pede_binaryzation_cluster()
 
     char inPdedFile[] = "../data/pede.txt";
     // char inDataFile[] = "../data/out5.mdat";
-    char inDataFile[] = "../data/out6.mdat";
+    char inDataFile[] = "../data/out3.mdat";
     // char inDataFile[] = "../data/out7.mdat";
     // char inDataFile[] = "../data/out8.mdat";
     // char inDataFile[] = "../data/out9.mdat";
@@ -114,8 +114,8 @@ int mdat_cut_pede_binaryzation_cluster()
     // ofstream output;
     // output.open(output_txt);//覆盖模式
 
-    for (int i = 0; i < iFrames; i++)
-    // for (int i = 0; i <= 45; i++)
+    // for (int i = 0; i < iFrames; i++)
+    for (int i = 0; i <= 116; i++)
     {
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         H3 = new TH2F(Form("H3_%d", i), "Projection", 72, 0, 72, 72, 0, 72);

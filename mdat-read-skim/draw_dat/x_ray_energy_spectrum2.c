@@ -31,9 +31,9 @@ int x_ray_energy_spectrum2()
     // gStyle->SetOptStat(1111);
     gStyle->SetOptFit();//1011
 
-    TCanvas *c1 = new TCanvas("c1", "stacked hists", 500, 500);
+    TCanvas *c1 = new TCanvas("c1", "stacked hists", 500, 400);
 
-    TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 120, 0, 12000);
+    TH1F *chip01 = new TH1F("chip01", "", 120, 0, 12000);
     // TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 80, 0, 8000);
     // TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 100, 0, 10000);
 
@@ -41,9 +41,10 @@ int x_ray_energy_spectrum2()
 
     char inputfile01[100];
 
-    sprintf(inputfile01, "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-70/00_output_energy_1_10000.dat");
-    // sprintf(inputfile01, "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe/00_output_energy_1_9000.dat");
+    sprintf(inputfile01, "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/00_output_energy_1_10000.dat");
+    // sprintf(inputfile01, "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-30/00_output_energy_1_9000.dat");
     // sprintf(inputfile01, "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/00_output_energy_1_5665.dat");
+    // sprintf(inputfile01, "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/00_output_energy_1_5299.dat");
 
     ifstream fin(inputfile01, std::ios::in);
 
@@ -76,9 +77,10 @@ int x_ray_energy_spectrum2()
     chip01->Draw();
     // chip01->Fit("gaus","Q");//gaus fit，Q is Quiet mode, no show paremeters in shell
     chip01->Fit("gaus");//fit chip01
-    // chip01->Fit("gaus","R","",2700,12000);//R is Use the range speciﬁed in the function range
-    // chip01->Fit("gaus","R","",680,4000);//R is Use the range speciﬁed in the function range
-    // chip01->Fit("gaus","R","",100,6000);//R is Use the range speciﬁed in the function range
+    // chip01->Fit("gaus","R","",2700,12000);//Ne10DME-80kPa-DV350GV630IV300-55Fe
+    // chip01->Fit("gaus","R","",680,4000);//Ne20DME-80kPa-DV350GV760IV300-55Fe
+    // chip01->Fit("gaus","R","",100,6000);//Ne20DME-80kPa-DV350GV770IV300-X-ray-generator
+    // chip01->Fit("gaus","R","",2400,15000);//Ne10DME-80kPa-DV350GV630IV300-X-ray-generator
 
     TLatex l1;
     l1.SetTextFont(42);
@@ -98,11 +100,12 @@ int x_ray_energy_spectrum2()
     l3.SetTextAlign(21);
     l3.SetTextSize(.04);
     l3.SetTextAngle(0);
-    l3.SetTextColor(kBlue);
-    l3.DrawLatexNDC(.63, .64, "Energy count");
+    l3.SetTextColor(kBlack);
+    l3.DrawLatexNDC(.52, .81, "5.9keV");
 
-    c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-55Fe5-70.png"));
-    // c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV760IV300-55Fe.png"));
+    c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-55Fe5-80.png"));
+    // c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-X-ray-generator.png"));
+    // c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV760IV300-55Fe5-30.png"));
     // c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV770IV300-X-ray-generator.png"));
 
     fin.clear();//就是刷新缓存
