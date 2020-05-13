@@ -1,4 +1,4 @@
-//去除本底，ADC值的和输出到文件，以便画出能谱图
+//去除本底，将径迹输出到文件
 
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -48,8 +48,8 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
     // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2.mdat";
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out1.mdat";
-    // char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/pede.txt";
-    // char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/";
+    char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/pede.txt";
+    char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/";
 
     // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-10/pede.txt";
     // char inDataFile_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-10/";
@@ -57,8 +57,8 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
     // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator5-10/pede.txt";
     // char inDataFile_dir[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator5-10/";
 
-    char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";//int型，需更改2处
-    char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
+    // char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";//int型，需更改2处
+    // char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
 
     char inDataFile[200];
     sprintf(inDataFile, "%s%d-%d.mdat", inDataFile_dir, iStart_num + 1, iStart_num + iAccout);
@@ -89,7 +89,7 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
 
     //////////////////////////////////////////////////How many Frame counts
     // unsigned short _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1
-    int _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1-------->2/3
+    int _data0_short[NX][NY]; //size of 1 frame for .mdat, .pd1-------->2/2
     int fz = file_loder::file_size(inDataFile);
     cout << "the size of file is: " << fz << endl;
     int iFrames = 0;
@@ -123,7 +123,7 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
         H2 = new TH2F(Form("H2_%d", i), "Projection", 72, 0, 72, 72, 0, 72);
         sumsig = 0;
         // unsigned short _data_short[NX][NY];//for .mdat
-        int _data_short[NX][NY];//for .dat-------->1/3
+        int _data_short[NX][NY];//for .dat-------->1/2
         infileSig.read((char *)(&_data_short), sizeof(_data_short));
         for (int ii = 0; ii < NX; ii++)
         {
@@ -134,7 +134,7 @@ void mdat_cut_pede_binaryzation_cluster_dir_image(int iStart_num, int iAccout)
                 H2->Fill(ii, jj, array3D[i][ii][jj]);
             }
         }
-
+//找出像素值的范围，以设置SetRangeUser
         max2d = array3D[i][0][0];
         min2d = array3D[i][0][0];
 

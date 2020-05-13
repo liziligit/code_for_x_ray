@@ -98,7 +98,7 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     a.nRow = NX;
     a.nCol = NY;
     a.d = new int[a.nRow * a.nCol];
-    const int mini_cluster_size_area = 20; //像素个数小于10个，就删除
+    const int mini_cluster_size_area = 70; //像素个数小于10个，就删除
     for (int i = 0; i < a.nRow; i++)
     {
         for (int j = 0; j < a.nCol; j++)
@@ -138,7 +138,7 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     // char inDataFile[] = "../data/out11.mdat";
     // char inDataFile[] = "../data/out12.mdat";
     // char output_txt[] = "./output_txt.dat"; //for debug
-    char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-20/"; //for debug
+    char output_mdat_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-70_second_frame/"; //for debug
     // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-30/"; //for debug
     // char output_mdat_dir[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/"; //for debug
     // int iStart_num = 0;
@@ -155,8 +155,8 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     struct dirent *ptr;
     dir = opendir(beamfn); //打开一个目录
 
-    cout << inPdedFile << endl;
-    cout << beamfn << "out*.mdat" << endl;
+    // cout << inPdedFile << endl;
+    // cout << beamfn << "out*.mdat" << endl;
 
     while ((ptr = readdir(dir)) != NULL) //循环读取目录数据
     {
@@ -182,9 +182,9 @@ int mdat_cut_pede_binaryzation_cluster_dir(int iStart_num, int iAccout)//由ener
     //     cout << idList[j] << ' ';
     // }
     // cout << "!!!" << endl;
-    cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files"
-         << " -> "
-         << "[" << idList.front() << "..." << idList.back() << "]" << endl;
+    // cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files"
+        //  << " -> "
+        //  << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
 
@@ -210,7 +210,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
 {   
     // sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
     sprintf(inDataFile, "%sout%d.mdat", beamfn, idList[fileId]);
-    cout << inDataFile << endl;
+    // cout << inDataFile << endl;
     ifstream infileSig(inDataFile, ios::binary);
 
     //////////////////////////////////////////////////How many Frame counts
@@ -219,7 +219,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     // cout << "the size of file is: " << fz << endl;
     int iFrames = 0;
     iFrames = fz / sizeof(_data0_short);
-    cout << "iFrame num is: " << iFrames << endl; //808
+    // cout << "iFrame num is: " << iFrames << endl; //808
     //////////////////////////////////////////////////How many Frame counts
 
     //*******************for 3D array*******************************
@@ -410,8 +410,10 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
             if (ivec_sumsigADC[2 * i + 1 - 2] == 0 &&                      //前1帧
                 ivec_sumsigADC[2 * i + 1 + 2] < ivec_sumsigADC[2 * i + 1]) //后1帧小些
             {
-                ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2 * i]);
-                ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2 * i + 1]);
+                // ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2 * i]);//取第一帧
+                // ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2 * i + 1]);//取第一帧
+                ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2 * (i + 1)]);//尝试取第二帧
+                ivec_sumsigADC_filter.push_back(ivec_sumsigADC[2 * (i + 1) + 1]);//尝试取第二帧
             }
         }
         else
@@ -473,7 +475,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
         }
     }
 
-    cout << "extract "<< iCount_exract << " frame"<< endl;
+    cout << "extract "<< iCount_exract << " frame"<< " for " << idList[fileId] << ".mdat"<< endl;
 
     //*******************extract good cluster*******************************
 

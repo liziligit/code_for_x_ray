@@ -1,4 +1,4 @@
-//去除本底，ADC值的和输出到文件，以便画出能谱图
+//去除本底，ADC值的和输出到.dat文件，以便后面x_ray_energy_spectrum2.c调用画出能谱图
 
 // #include "TROOT.h"
 // #include "TFile.h"
@@ -38,7 +38,7 @@ void mdat_cut_pede_binaryzation_cluster_dir_energy(int iStart_num, int iAccout)
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out2.mdat";
     // char inDataFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/out1.mdat";
     char inPdedFile[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-20/pede.txt";
-    char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-20/";
+    char inDataFile_dir[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-70_second_frame/";
 
     // char inPdedFile[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-30/pede.txt";
     // char inDataFile_dir[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-30/";
@@ -55,7 +55,8 @@ void mdat_cut_pede_binaryzation_cluster_dir_energy(int iStart_num, int iAccout)
     // char inDataFile[] = "../data/out7.mdat";
     // char inDataFile[] = "../data/extract55Fe01_0_3000.mdat";
     // char output_txt[] = "./output_txt.dat"; //输出72*72矩阵
-    char output_energy[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-20/00_output_energy_1_10000.dat"; //输出每帧ADC的和
+    // char output_energy[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-20/00_output_energy_1_10000.dat"; //输出每帧ADC的和
+    char output_energy[] = "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-70_second_frame/00_output_energy_1_10000.dat"; //输出每帧ADC的和
     // char output_energy[] = "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-30/00_output_energy_1_9000.dat"; //输出每帧ADC的和
     // char output_energy[] = "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/00_output_energy_1_5665.dat"; //输出每帧ADC的和
     // char output_energy[] = "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/00_output_energy_1_5299.dat"; //输出每帧ADC的和

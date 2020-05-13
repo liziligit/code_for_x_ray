@@ -72,7 +72,7 @@ int extractId(string &nameId, string head, string tail)
 }
 
 int mdat_cut_pede_binaryzation_cluster_dir_pixel_num(int iStart_num, int iAccout)//由energy.sh输入参数
-// int mdat_cut_pede_binaryzation_cluster_dir()//他程序中手动设置参数
+// int mdat_cut_pede_binaryzation_cluster_dir()//程序中手动设置参数
 {
     TCanvas *c1 = new TCanvas("c1", "stacked hists", 500, 500);
     // c1->Divide(2, 1);
@@ -94,6 +94,7 @@ int mdat_cut_pede_binaryzation_cluster_dir_pixel_num(int iStart_num, int iAccout
     double down_x = 0;
     double boundary_min = 10;//重心坐标下限
     double boundary_max = 60;//重心坐标上限
+    double iCount_exract_total = 0;//统计径迹数累加值
 
     binArray a;
     a.nRow = NX;
@@ -125,11 +126,15 @@ int mdat_cut_pede_binaryzation_cluster_dir_pixel_num(int iStart_num, int iAccout
     // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/pede.txt";
     // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-55Fe/";
 
-    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
-    char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/";
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/pede.txt";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV760IV300-55Fe/";
 
-    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
-    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/";
+    // char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/pede.txt";
+    // char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/";
+
+    char inPdedFile[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/pede.txt";
+    char beamfn[] = "/Volumes/Elements/THGEM+Topmetal_data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/";
+
     // char inDataFile[] = "../data/out5.mdat";
     // char inDataFile[] = "../data/out6.mdat";
     // char inDataFile[] = "../data/out7.mdat";
@@ -156,8 +161,8 @@ int mdat_cut_pede_binaryzation_cluster_dir_pixel_num(int iStart_num, int iAccout
     struct dirent *ptr;
     dir = opendir(beamfn); //打开一个目录
 
-    cout << inPdedFile << endl;
-    cout << beamfn << "out*.mdat" << endl;
+    // cout << inPdedFile << endl;
+    // cout << beamfn << "out*.mdat" << endl;
 
     while ((ptr = readdir(dir)) != NULL) //循环读取目录数据
     {
@@ -183,9 +188,9 @@ int mdat_cut_pede_binaryzation_cluster_dir_pixel_num(int iStart_num, int iAccout
     //     cout << idList[j] << ' ';
     // }
     // cout << "!!!" << endl;
-    cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files"
-         << " -> "
-         << "[" << idList.front() << "..." << idList.back() << "]" << endl;
+    // cout << "The num of out*.mdat in idList[] is: " << idList.size() << " files"
+        //  << " -> "
+        //  << "[" << idList.front() << "..." << idList.back() << "]" << endl;
 
     cout << "Begin to analysis IdList[]: begin " << iStart_num << " totle " << iAccout << endl;
 
@@ -211,7 +216,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
 {   
     // sprintf(inDataFile, "../data/out%d.mdat", idList[fileId]);
     sprintf(inDataFile, "%sout%d.mdat", beamfn, idList[fileId]);
-    cout << inDataFile << endl;
+    // cout << inDataFile << endl;
     ifstream infileSig(inDataFile, ios::binary);
 
     //////////////////////////////////////////////////How many Frame counts
@@ -220,7 +225,7 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     // cout << "the size of file is: " << fz << endl;
     int iFrames = 0;
     iFrames = fz / sizeof(_data0_short);
-    cout << "iFrame num is: " << iFrames << endl; //808
+    // cout << "iFrame num is: " << iFrames << endl; //808
     //////////////////////////////////////////////////How many Frame counts
 
     //*******************for 3D array*******************************
@@ -481,8 +486,9 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
         }
     }
 
-    cout << "extract " << iCount_exract << " frame" << endl;
-
+    // cout << "extract " << iCount_exract << " frame" << endl;
+    iCount_exract_total = iCount_exract_total + iCount_exract;
+    cout << "extract " << iCount_exract_total << " tracks" << ", out"<< idList[fileId]<< ".dat"<< endl;
     //*******************extract good cluster*******************************
 
     ivec_sumsigADC.clear();
@@ -495,7 +501,9 @@ for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
 }//end for (int fileId = iStart_num; fileId < iStart_num + iAccout; fileId++)
     chip01->Draw();
     // c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-55Fe_pixel_num.png"));
-    c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV760IV300-55Fe_pixel_num.png"));
+    // c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV760IV300-55Fe_pixel_num.png"));
+    // c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-X-ray-generator_pixel_num.png"));
+    c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV770IV300-X-ray-generator_pixel_num.png"));
     infilePede.close();
     // output_m.close();
     return 0;

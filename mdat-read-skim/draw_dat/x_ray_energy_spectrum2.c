@@ -1,4 +1,5 @@
 //root Hitmap1.C
+//画能谱拟合图，例如61%，保存为pdf格式再latex调用
 #include <unistd.h>
 #include <vector>
 #include "TThread.h"
@@ -37,11 +38,12 @@ int x_ray_energy_spectrum2()
     // TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 80, 0, 8000);
     // TH1F *chip01 = new TH1F("chip01", "This is the energy spectrum", 100, 0, 10000);
 
-    chip01->SetLineColor(kRed);
+    chip01->SetLineColor(kBlack);//设置Hist线的颜色
+    chip01->SetLineWidth(2);
 
     char inputfile01[100];
 
-    sprintf(inputfile01, "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80/00_output_energy_1_10000.dat");
+    sprintf(inputfile01, "../data/Ne10DME-80kPa-DV350GV630IV300-55Fe5-80_second_frame/00_output_energy_1_10000.dat");
     // sprintf(inputfile01, "../data/Ne20DME-80kPa-DV350GV760IV300-55Fe5-30/00_output_energy_1_9000.dat");
     // sprintf(inputfile01, "../data/Ne20DME-80kPa-DV350GV770IV300-X-ray-generator/00_output_energy_1_5665.dat");
     // sprintf(inputfile01, "../data/Ne10DME-80kPa-DV350GV630IV300-X-ray-generator/00_output_energy_1_5299.dat");
@@ -76,11 +78,30 @@ int x_ray_energy_spectrum2()
 
     chip01->Draw();
     // chip01->Fit("gaus","Q");//gaus fit，Q is Quiet mode, no show paremeters in shell
-    chip01->Fit("gaus");//fit chip01
-    // chip01->Fit("gaus","R","",2700,12000);//Ne10DME-80kPa-DV350GV630IV300-55Fe
+    // chip01->Fit("gaus");//fit chip01, 默认红色线
+    chip01->Fit("gaus","N");//fit chip01, 不画线
+
+    // TF1 * f = new TF1("f","gaus");
+    // f->SetParLimits(1, 3400, 3500); 
+    // f->SetParLimits(2, 1000, 1100);//0 is normalization term, 1 is mean, 2 is sigma,
+    // chip01->Fit(f,"B");// fit within specified range, use ParLimits
+
+    // chip01->Fit("gaus","R","",1000,8000);//Ne10DME-80kPa-DV350GV630IV300-55Fe
     // chip01->Fit("gaus","R","",680,4000);//Ne20DME-80kPa-DV350GV760IV300-55Fe
     // chip01->Fit("gaus","R","",100,6000);//Ne20DME-80kPa-DV350GV770IV300-X-ray-generator
     // chip01->Fit("gaus","R","",2400,15000);//Ne10DME-80kPa-DV350GV630IV300-X-ray-generator
+c1->Modified();
+c1->Update(); 
+TPaveStats *statsbox01 = (TPaveStats*)c1->GetPrimitive("stats");
+statsbox01->SetName("chip01");
+statsbox01->SetLineColor(kBlack);
+statsbox01->SetTextColor(kBlack);
+statsbox01->SetFillColor(0);//set stats box fill color
+statsbox01->SetFillStyle(0);//set fill style
+statsbox01->SetX1NDC(0.65);//lower left corner X1
+statsbox01->SetY1NDC(0.64);//lower left corner Y1
+statsbox01->SetX2NDC(0.9);//top right corner X2
+statsbox01->SetY2NDC(0.9);//top right corner Y2
 
     TLatex l1;
     l1.SetTextFont(42);
@@ -101,9 +122,9 @@ int x_ray_energy_spectrum2()
     l3.SetTextSize(.04);
     l3.SetTextAngle(0);
     l3.SetTextColor(kBlack);
-    l3.DrawLatexNDC(.52, .81, "5.9keV");
+    l3.DrawLatexNDC(.43, .77, "5.9keV");
 
-    c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-55Fe5-80.png"));
+    c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-55Fe5-80_second_frame.pdf"));
     // c1->SaveAs(TString::Format("./Ne10DME-80kPa-DV350GV630IV300-X-ray-generator.png"));
     // c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV760IV300-55Fe5-30.png"));
     // c1->SaveAs(TString::Format("./Ne20DME-80kPa-DV350GV770IV300-X-ray-generator.png"));
